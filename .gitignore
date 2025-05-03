@@ -1,0 +1,19 @@
+# 환경변수 (절대 커밋 금지)
+backend/.env
+frontend/.env
+frontend/.env.local
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/.pytest_cache/
+
+# Node
+frontend/node_modules/
+frontend/build/
+
+# 기타
+.DS_Store
+*.log
