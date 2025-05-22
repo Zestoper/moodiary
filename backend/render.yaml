@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: moodiary-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false        # Render 대시보드에서 직접 입력 (Neon connection string)
+      - key: SECRET_KEY
+        sync: false
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "10080"
+      - key: GROQ_API_KEY
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false        # Vercel 배포 후 주소 입력 (예: https://moodiary.vercel.app)
