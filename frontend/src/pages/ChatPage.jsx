@@ -23,7 +23,8 @@ export default function ChatPage() {
 
   // DiaryPage에서 선택한 페르소나를 읽어옴 (기본값: friend)
   const persona = localStorage.getItem('ai_persona') || 'friend';
-  const PERSONA_LABELS = { friend: '🌿 친구', mentor: '📚 선배', counselor: '🧠 상담사', cheerleader: '🎉 응원단', simsimi: '🤪 심심이', realist: '🔥 현실러' };
+  const PERSONA_LABELS  = { friend: '🌿 친구', mentor: '📚 선배', counselor: '🧠 상담사', cheerleader: '🎉 응원단', simsimi: '🤪 심심이', realist: '🔥 현실러' };
+  const PERSONA_AVATARS = { friend: '🌿', mentor: '📚', counselor: '🧠', cheerleader: '🎉', simsimi: '🤪', realist: '🔥' };
 
   // 오늘 날짜
   const now = new Date();
@@ -192,7 +193,9 @@ export default function ChatPage() {
         {messages.map((msg) => (
           <div key={msg.id} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 16 }}>
             {msg.role === 'assistant' && (
-              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 8, flexShrink: 0, fontSize: 18 }}>🌿</div>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 8, flexShrink: 0, fontSize: 18 }}>
+                {PERSONA_AVATARS[persona]}
+              </div>
             )}
             <div style={{
               maxWidth: '72%',
