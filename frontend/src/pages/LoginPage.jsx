@@ -89,7 +89,8 @@ export default function LoginPage() {
           {isRegister && (
             <input type="text" placeholder="닉네임" value={username} onChange={(e) => setUsername(e.target.value)} />
           )}
-          <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit(e)} />
 
           {error && (
             <p style={{ color: '#e07070', fontSize: 13, textAlign: 'center' }}>{error}</p>
