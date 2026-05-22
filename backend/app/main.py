@@ -31,20 +31,12 @@ def migrate_db():
 
 # add_middleware: 모든 요청이 라우터에 도달하기 전에 거치는 처리 로직을 등록
 # CORS란? 브라우저가 다른 출처(포트/도메인)로 요청할 때 보안상 막는 정책. 이걸 풀어줘야 프론트(3000)→백엔드(8000) 통신 가능
-import os
-
-ALLOWED_ORIGINS = ["http://localhost:3000"]
-# 배포 시 FRONTEND_URL 환경변수를 Render에서 설정하면 자동으로 추가됨
-_frontend_url = os.getenv("FRONTEND_URL")
-if _frontend_url:
-    ALLOWED_ORIGINS.append(_frontend_url)
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,  # 로컬 + Vercel 프론트엔드
-    allow_credentials=True,                   # True여야 Authorization 헤더(JWT 토큰)와 쿠키를 같이 보낼 수 있음
-    allow_methods=["*"],                      # "*"는 GET, POST, PUT, DELETE, PATCH, OPTIONS 전부 허용
-    allow_headers=["*"],                      # "*"는 Content-Type, Authorization 등 모든 헤더 허용
+    allow_origins=["*"],   # 모든 출처 허용 (포트폴리오용)
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # include_router: 별도 파일로 분리한 라우터를 앱에 연결
