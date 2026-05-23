@@ -587,8 +587,8 @@ export default function DiaryPage() {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                  <button onClick={() => navigate(`/chat?diary_id=${selected.id}`)} style={{ flex: 1, padding: '12px 0', background: 'var(--primary)', color: 'white', fontWeight: 600 }}>이 일기로 AI 채팅</button>
+                <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+                  <button onClick={() => navigate(`/chat?diary_id=${selected.id}`)} style={{ flex: '1 1 auto', padding: '12px 0', background: 'var(--primary)', color: 'white', fontWeight: 600, minWidth: 120 }}>이 일기로 AI 채팅</button>
                   <button onClick={() => handleExportPDF(selected)} style={{ padding: '12px 16px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontWeight: 600 }} title="PDF로 저장">📄</button>
                   <button onClick={handleEditStart} style={{ padding: '12px 20px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontWeight: 600 }}>✏️ 수정</button>
                   {confirmDeleteId === selected.id ? (

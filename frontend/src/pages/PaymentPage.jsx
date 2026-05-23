@@ -182,7 +182,7 @@ export default function PaymentPage() {
         {loading ? (
           <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>불러오는 중...</p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 16, marginBottom: 36 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 36 }}>
             {packages.map((pkg) => (
               <div key={pkg.id} style={{
                 background: 'var(--surface)', borderRadius: 'var(--radius)',

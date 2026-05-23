@@ -123,17 +123,17 @@ export default function AdminPage() {
 
       <div className="page-body" style={{ maxWidth: 900, margin: '0 auto', padding: '28px 16px' }}>
         {/* 탭 */}
-        <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
           {TABS.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                padding: '10px 16px', fontSize: 14, fontWeight: tab === t ? 600 : 400,
+                padding: '10px 12px', fontSize: 13, fontWeight: tab === t ? 600 : 400,
                 color: tab === t ? 'var(--primary)' : 'var(--text-muted)',
                 borderBottom: tab === t ? '2px solid var(--primary)' : '2px solid transparent',
-                marginBottom: -1,
+                marginBottom: -1, whiteSpace: 'nowrap', flexShrink: 0,
               }}
             >
               {t}
