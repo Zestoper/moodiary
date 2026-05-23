@@ -207,7 +207,7 @@ export default function CalendarPage() {
     year === todayDate.getFullYear();
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
 
       {/* ── 상단 네비게이션 ── */}
       <nav style={{

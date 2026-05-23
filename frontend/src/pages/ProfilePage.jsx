@@ -242,7 +242,7 @@ export default function ProfilePage() {
   if (!user) return null; // 로딩 중엔 아무것도 렌더링 안 함
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
 
       {/* ── 네비게이션 ── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, padding: '0 24px', height: 56, background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 16 }}>

@@ -399,7 +399,7 @@ export default function DiaryPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
       {/* ── 네비게이션 ── */}
       <nav style={NAV_STYLE}>
         <div>

@@ -1,1 +1,7 @@
 /* App.css는 비워둠. 각 페이지 스타일은 index.css 전역 변수와 인라인으로 처리 */
+
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+}

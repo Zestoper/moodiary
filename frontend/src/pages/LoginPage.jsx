@@ -53,6 +53,7 @@ export default function LoginPage() {
       alignItems: 'center',
       justifyContent: 'center',
       background: 'var(--bg)',
+      overflowX: 'hidden',
     }}>
       <div className="auth-card" style={{
         width: '100%',

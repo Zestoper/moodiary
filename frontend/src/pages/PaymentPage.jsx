@@ -121,7 +121,7 @@ export default function PaymentPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
       {/* 네비게이션 */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,

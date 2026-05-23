@@ -106,7 +106,7 @@ export default function ConsultPage() {
 
   return (
     // 전체 페이지: 최소 높이 100vh, 아이보리 배경
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
 
       {/* ── 상단 네비게이션 바 ── */}
       <nav style={{

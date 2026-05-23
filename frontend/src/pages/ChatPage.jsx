@@ -152,7 +152,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
 
       {/* ── 헤더 ── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, padding: '0 24px', height: 56, background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -168,11 +168,9 @@ export default function ChatPage() {
             </button>
           )}
           {confirmClear && (
-            // window.confirm 대신 인라인 확인 버튼 — 브라우저 기본 팝업 없이 앱 안에서 처리
             <>
-              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>정말 삭제할까요?</span>
-              <button onClick={handleClear} style={{ background: '#e08080', color: 'white', fontSize: 12, padding: '6px 12px', borderRadius: 10 }}>삭제</button>
-              <button onClick={() => setConfirmClear(false)} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 12, padding: '6px 12px', border: '1px solid var(--border)', borderRadius: 10 }}>취소</button>
+              <button onClick={handleClear} style={{ background: '#e08080', color: 'white', fontSize: 12, padding: '5px 10px', borderRadius: 10 }}>삭제</button>
+              <button onClick={() => setConfirmClear(false)} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 12, padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 10 }}>취소</button>
             </>
           )}
           <button onClick={toggleTheme} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 16, padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 10 }}>

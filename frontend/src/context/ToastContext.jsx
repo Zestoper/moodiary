@@ -54,15 +54,14 @@ export function ToastProvider({ children }) {
               fontSize: 14,
               fontWeight: 500,
               boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-              // type에 따라 배경색 다르게
               background:
-                toast.type === 'success' ? '#82c9a0'        // 성공: 초록
-              : toast.type === 'error'   ? '#e08080'        // 에러: 빨강
-              :                            'var(--primary)', // 기본: 테라코타
+                toast.type === 'success' ? '#82c9a0'
+              : toast.type === 'error'   ? '#e08080'
+              :                            'var(--primary)',
               color: 'white',
               animation: 'toastSlideIn 0.25s ease',
-              // CSS keyframe: index.css에 추가
-              whiteSpace: 'nowrap',
+              maxWidth: 'calc(100vw - 48px)',
+              wordBreak: 'keep-all',
               pointerEvents: 'auto',
             }}
           >

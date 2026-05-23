@@ -107,7 +107,7 @@ export default function AdminPage() {
     : 1;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
       {/* 헤더 */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
