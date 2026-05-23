@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login, register } from '../api/auth';
@@ -11,6 +11,20 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  // 'checking' | 'ok' | 'error'
+  const [serverStatus, setServerStatus] = useState('checking');
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/`);
+        setServerStatus(res.ok ? 'ok' : 'error');
+      } catch {
+        setServerStatus('error');
+      }
+    };
+    check();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +75,16 @@ export default function LoginPage() {
           <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 4 }}>
             오늘의 감정을 기록해요
           </p>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 10, fontSize: 12,
+            color: serverStatus === 'ok' ? '#2e7d32' : serverStatus === 'error' ? '#e07070' : 'var(--text-muted)' }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
+              background: serverStatus === 'ok' ? '#4caf50' : serverStatus === 'error' ? '#e07070' : 'var(--text-muted)',
+              animation: serverStatus === 'checking' ? 'blink 1s step-end infinite' : 'none',
+            }} />
+            {serverStatus === 'checking' && '서버 연결 중...'}
+            {serverStatus === 'ok'       && '서버 연결됨'}
+            {serverStatus === 'error'    && '서버 연결 실패'}
+          </div>
         </div>
 
         {/* 탭 전환 */}
