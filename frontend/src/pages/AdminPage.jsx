@@ -159,7 +159,7 @@ export default function AdminPage() {
           <div>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 12 }}>총 {users.length}명</p>
             <div style={{ overflowX: 'auto', width: '100%' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <table style={{ width: '100%', minWidth: 700, borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
                     {['ID', '이메일', '닉네임', '일기', '크레딧', '관리자', '가입일', '크레딧 지급'].map((h) => (
@@ -244,7 +244,7 @@ export default function AdminPage() {
               <p style={{ color: 'var(--text-muted)' }}>결제 내역이 없어요.</p>
             ) : (
               <div style={{ overflowX: 'auto', width: '100%' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <table style={{ width: '100%', minWidth: 580, borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
                       {['ID', '이메일', '닉네임', '금액', '크레딧', '상태', '일시'].map((h) => (

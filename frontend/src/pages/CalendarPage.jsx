@@ -298,9 +298,9 @@ export default function CalendarPage() {
         )}
 
         {/* ── 달력 본체 ── */}
-        <div style={{ ...CARD_STYLE, marginBottom: 20 }}>
+        <div className="mcard" style={{ ...CARD_STYLE, marginBottom: 20 }}>
           {/* 요일 헤더 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6, marginBottom: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 8 }}>
             {WEEKDAYS.map((d, i) => (
               <div
                 key={d}
@@ -320,7 +320,7 @@ export default function CalendarPage() {
           </div>
 
           {/* 날짜 셀 그리드 */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
             {cells.map((day, idx) => {
               // 빈 칸 (이번 달 날짜 없는 자리)
               if (!day) return <div key={idx} style={{ aspectRatio: '1' }} />;
