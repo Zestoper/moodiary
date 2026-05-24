@@ -496,8 +496,8 @@ export default function DiaryPage() {
                   <p style={{ lineHeight: 1.9, whiteSpace: 'pre-wrap', marginBottom: 24 }}>{selected.content}</p>
                   {selected.emotion_tags && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', background: 'var(--bg)', borderRadius: 12 }}>
-                      <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{selected.emotion_tags}</span>
-                      <span style={{ marginLeft: 'auto', background: emotionColor(selected.emotion_score), color: 'white', padding: '2px 10px', borderRadius: 20, fontSize: 13 }}>
+                      <span style={{ color: 'var(--primary)', fontWeight: 600, flex: 1, minWidth: 0 }}>{selected.emotion_tags}</span>
+                      <span style={{ marginLeft: 'auto', background: emotionColor(selected.emotion_score), color: 'white', padding: '2px 10px', borderRadius: 20, fontSize: 13, flexShrink: 0, whiteSpace: 'nowrap' }}>
                         {selected.emotion_score}점
                       </span>
                     </div>
@@ -704,10 +704,10 @@ export default function DiaryPage() {
                   </div>
                 )}
                 {/* 헤더 행: 제목 + 날씨 배지 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <h3 style={{ fontFamily: 'Nanum Myeongjo, serif' }}>오늘 하루를 기록해요</h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, gap: 8 }}>
+                  <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', flex: 1, minWidth: 0 }}>오늘 하루를 기록해요</h3>
                   {weatherInfo && (
-                    <span style={{ fontSize: 13, color: 'var(--text-muted)', background: 'var(--bg)', padding: '4px 10px', borderRadius: 20, border: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)', background: 'var(--bg)', padding: '4px 10px', borderRadius: 20, border: '1px solid var(--border)', flexShrink: 0, whiteSpace: 'nowrap' }}>
                       {weatherInfo.emoji} {weatherInfo.text} {weatherInfo.temperature}°C
                     </span>
                   )}
