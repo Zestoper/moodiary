@@ -14,7 +14,7 @@ import BottomNav from '../components/BottomNav';
 const CARD_STYLE = {
   background: 'var(--surface)',
   borderRadius: 'var(--radius)',
-  padding: '24px 28px',
+  padding: '20px 20px',
   boxShadow: 'var(--shadow)',
   border: '1px solid var(--border)',
 };
@@ -242,7 +242,7 @@ export default function ProfilePage() {
   if (!user) return null; // 로딩 중엔 아무것도 렌더링 안 함
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* ── 네비게이션 ── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, padding: '0 24px', height: 56, background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -308,7 +308,7 @@ export default function ProfilePage() {
               <p style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 20, fontWeight: 700, color: 'var(--text)' }}>
                 {user.username}
               </p>
-              <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{user.email}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 13, wordBreak: 'break-all' }}>{user.email}</p>
             </div>
           </div>
 

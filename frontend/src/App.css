@@ -1,7 +1,8 @@
 /* App.css는 비워둠. 각 페이지 스타일은 index.css 전역 변수와 인라인으로 처리 */
 
+/* #root는 overflow-x: hidden 대신 width: 100%로 너비를 제한
+   실제 overflow는 각 페이지 구조에서 근본 원인을 수정하여 해결 */
 #root {
-  overflow-x: hidden;
-  max-width: 100vw;
-  position: relative;
+  width: 100%;
+  min-height: 100vh;
 }

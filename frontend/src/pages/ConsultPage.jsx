@@ -10,11 +10,11 @@ import BottomNav from '../components/BottomNav';
 
 // ── 공통 카드 스타일 ────────────────────────────────────────────────────────────
 const CARD_STYLE = {
-  background: 'var(--surface)',       // 흰색 카드 배경
-  borderRadius: 'var(--radius)',      // 16px 둥근 모서리
-  padding: '24px 28px',
-  boxShadow: 'var(--shadow)',         // 부드러운 그림자
-  border: '1px solid var(--border)', // 연한 테두리
+  background: 'var(--surface)',
+  borderRadius: 'var(--radius)',
+  padding: '20px 20px',
+  boxShadow: 'var(--shadow)',
+  border: '1px solid var(--border)',
 };
 
 export default function ConsultPage() {
@@ -106,7 +106,7 @@ export default function ConsultPage() {
 
   return (
     // 전체 페이지: 최소 높이 100vh, 아이보리 배경
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* ── 상단 네비게이션 바 ── */}
       <nav style={{
@@ -205,6 +205,8 @@ export default function ConsultPage() {
                     borderRadius: 20,
                     fontWeight: 700,
                     fontSize: 16,
+                    maxWidth: '100%',
+                    wordBreak: 'keep-all',
                   }}>
                     {selected.verdict}
                   </span>
@@ -344,6 +346,8 @@ export default function ConsultPage() {
                   fontWeight: 700,
                   fontSize: 16,
                   marginBottom: 20,
+                  maxWidth: '100%',
+                  wordBreak: 'keep-all',
                 }}>
                   {result.verdict}
                 </div>

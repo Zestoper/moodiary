@@ -207,7 +207,7 @@ export default function CalendarPage() {
     year === todayDate.getFullYear();
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* ── 상단 네비게이션 ── */}
       <nav style={{
@@ -530,8 +530,8 @@ export default function CalendarPage() {
             // 감정 점수 색상으로 왼쪽 강조 테두리
           }}>
             {/* 상단: 제목 + 감정 점수 뱃지 */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-              <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, marginBottom: 4 }}>
                   {selectedDiary.title}
                 </h3>
@@ -550,6 +550,7 @@ export default function CalendarPage() {
                   fontSize: 13,
                   fontWeight: 600,
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}>
                   {selectedDiary.emotion_score}점
                 </span>

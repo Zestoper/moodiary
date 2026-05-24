@@ -107,7 +107,7 @@ export default function AdminPage() {
     : 1;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       {/* 헤더 */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
@@ -158,7 +158,7 @@ export default function AdminPage() {
         {!loading && tab === '유저 목록' && (
           <div>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 12 }}>총 {users.length}명</p>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', width: '100%' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>
@@ -243,7 +243,7 @@ export default function AdminPage() {
             {payments.length === 0 ? (
               <p style={{ color: 'var(--text-muted)' }}>결제 내역이 없어요.</p>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
+              <div style={{ overflowX: 'auto', width: '100%' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)' }}>

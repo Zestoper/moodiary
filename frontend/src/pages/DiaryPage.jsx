@@ -399,7 +399,7 @@ export default function DiaryPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', overflowX: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       {/* ── 네비게이션 ── */}
       <nav style={NAV_STYLE}>
         <div>
@@ -771,10 +771,10 @@ export default function DiaryPage() {
                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(180,120,80,0.15)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, marginBottom: 4 }}>{diary.title}</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                      <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, marginBottom: 4, flex: 1, minWidth: 0 }}>{diary.title}</h3>
                       {diary.emotion_score && (
-                        <span style={{ background: emotionColor(diary.emotion_score), color: 'white', padding: '2px 10px', borderRadius: 20, fontSize: 12, whiteSpace: 'nowrap', marginLeft: 12 }}>
+                        <span style={{ background: emotionColor(diary.emotion_score), color: 'white', padding: '2px 10px', borderRadius: 20, fontSize: 12, whiteSpace: 'nowrap', flexShrink: 0 }}>
                           {diary.emotion_score}점
                         </span>
                       )}
