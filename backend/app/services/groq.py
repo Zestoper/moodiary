@@ -16,8 +16,9 @@ MODEL_CHAT    = "qwen/qwen3-32b"           # 실시간 채팅 스트리밍에 �
 
 
 def _filter_cjk(text: str) -> str:
-    # 한자/일본어를 공백으로 대체. "그期間에" → "그 에"
-    cleaned = re.sub(r'[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u3041-\u30FF\u31F0-\u31FF]', ' ', text)
+    # 한자/일본어/키릴 문자(러시아어 등)를 공백으로 대체. "그期間에" → "그 에"
+    # \u0400-\u04FF: 키릴 문자 범위 (러시아어, 우크라이나어 등 슬라브 언어)
+    cleaned = re.sub(r'[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u3041-\u30FF\u31F0-\u31FF\u0400-\u04FF]', ' ', text)
     return re.sub(r' {2,}', ' ', cleaned)  # .strip() 없음: 스트리밍 청크의 단어 경계 공백(' 힘' 등) 유지
 
 
