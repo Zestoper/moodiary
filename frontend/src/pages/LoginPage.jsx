@@ -29,6 +29,18 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (isRegister) {
+      if (!username.trim()) {
+        setError('닉네임을 입력해주세요.');
+        return;
+      }
+      if (password.length < 6) {
+        setError('비밀번호는 6자 이상 입력해주세요.');
+        return;
+      }
+    }
+
     try {
       if (isRegister) {
         await register(email, username, password);
