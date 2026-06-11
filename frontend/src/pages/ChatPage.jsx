@@ -155,25 +155,25 @@ export default function ChatPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
 
       {/* ── 헤더 ── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, padding: '0 24px', height: 56, background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <button onClick={() => navigate('/diary')} style={{ background: 'transparent', color: 'var(--text-muted)', padding: '6px 12px', fontSize: 14 }}>← 일기로</button>
+      <nav className="nav-top">
+        <button onClick={() => navigate('/diary')} className="btn-ghost">← 일기로</button>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>AI 친구</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>{today} · {PERSONA_LABELS[persona]}</p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {messages.length > 0 && !confirmClear && (
-            <button onClick={() => setConfirmClear(true)} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 12, padding: '6px 12px', border: '1px solid var(--border)', borderRadius: 10 }}>
+            <button onClick={() => setConfirmClear(true)} className="btn-icon" style={{ fontSize: 12 }}>
               대화 초기화
             </button>
           )}
           {confirmClear && (
             <>
-              <button onClick={handleClear} style={{ background: '#e08080', color: 'white', fontSize: 12, padding: '5px 10px', borderRadius: 10 }}>삭제</button>
-              <button onClick={() => setConfirmClear(false)} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 12, padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 10 }}>취소</button>
+              <button onClick={handleClear} className="btn-danger" style={{ padding: '5px 10px', fontSize: 12 }}>삭제</button>
+              <button onClick={() => setConfirmClear(false)} className="btn-icon" style={{ fontSize: 12, padding: '5px 10px' }}>취소</button>
             </>
           )}
-          <button onClick={toggleTheme} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 16, padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 10 }}>
+          <button onClick={toggleTheme} className="btn-icon">
             {isDark ? '☀️' : '🌙'}
           </button>
         </div>

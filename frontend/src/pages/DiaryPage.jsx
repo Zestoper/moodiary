@@ -59,12 +59,6 @@ const NAV_STYLE = {
   position: 'sticky', top: 0, zIndex: 100,
 };
 
-const CARD_STYLE = {
-  background: 'var(--surface)', borderRadius: 'var(--radius)',
-  padding: '20px 24px', boxShadow: 'var(--shadow)',
-  border: '1px solid var(--border)', cursor: 'pointer',
-  transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-};
 
 export default function DiaryPage() {
   const navigate = useNavigate();
@@ -445,7 +439,7 @@ export default function DiaryPage() {
 
             {isEditing ? (
               /* ── 수정 폼 ── */
-              <form onSubmit={handleEditSave} style={{ ...CARD_STYLE, cursor: 'default' }}>
+              <form onSubmit={handleEditSave} className="card" style={{ cursor: 'default' }}>
                 <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', marginBottom: 16 }}>일기 수정</h3>
                 <input
                   value={editTitle}
@@ -488,7 +482,7 @@ export default function DiaryPage() {
             ) : (
               /* ── 상세 보기 ── */
               <>
-                <div style={{ ...CARD_STYLE, cursor: 'default' }}>
+                <div className="card" style={{ cursor: 'default' }}>
                   <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 22, marginBottom: 8 }}>{selected.title}</h2>
                   <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
                     {new Date(selected.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -614,7 +608,7 @@ export default function DiaryPage() {
           /* ── 일기 목록 ── */
           <div>
             {/* ── AI 페르소나 선택 카드 ── */}
-            <div style={{ ...CARD_STYLE, cursor: 'default', marginBottom: 24 }}>
+            <div className="card" style={{ cursor: 'default', marginBottom: 24 }}>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>💬 AI 채팅 말투 선택</p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {AI_PERSONAS.map((p) => (
@@ -689,7 +683,7 @@ export default function DiaryPage() {
 
             {/* ── 일기 작성 폼 ── */}
             {showForm && (
-              <form onSubmit={handleCreate} style={{ ...CARD_STYLE, cursor: 'default', marginBottom: 24 }}>
+              <form onSubmit={handleCreate} className="card" style={{ cursor: 'default', marginBottom: 24 }}>
                 {/* 초안 복원 알림 */}
                 {draftRestored && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, padding: '8px 12px', background: 'var(--primary-light)', borderRadius: 8, fontSize: 13 }}>
@@ -767,7 +761,7 @@ export default function DiaryPage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {filteredDiaries.map((diary) => (
-                  <div key={diary.id} style={CARD_STYLE} onClick={() => setSelected(diary)}
+                  <div key={diary.id} className="card" style={{ cursor: 'pointer', transition: 'transform 0.15s ease, box-shadow 0.15s ease' }} onClick={() => setSelected(diary)}
                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(180,120,80,0.15)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
                   >

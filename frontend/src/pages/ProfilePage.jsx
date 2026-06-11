@@ -11,14 +11,6 @@ import { getDiaries } from '../api/diary';
 import api from '../api/axios'; // 닉네임 수정 API 직접 호출
 import BottomNav from '../components/BottomNav';
 
-const CARD_STYLE = {
-  background: 'var(--surface)',
-  borderRadius: 'var(--radius)',
-  padding: '20px 20px',
-  boxShadow: 'var(--shadow)',
-  border: '1px solid var(--border)',
-};
-
 // 선택 가능한 아바타 이모지 목록
 const AVATARS = ['🌿', '🌸', '🦊', '🐻', '🌙', '☀️', '🦋', '🌊', '🍀', '🎵', '🔥', '⭐'];
 
@@ -245,15 +237,15 @@ export default function ProfilePage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* ── 네비게이션 ── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, padding: '0 24px', height: 56, background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <button onClick={() => navigate('/diary')} style={{ background: 'transparent', color: 'var(--text-muted)', padding: '6px 12px', fontSize: 14 }}>
+      <nav className="nav-top">
+        <button onClick={() => navigate('/diary')} className="btn-ghost">
           ← 일기로
         </button>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>프로필</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>{today}</p>
         </div>
-        <button onClick={toggleTheme} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 16, padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 10 }}>
+        <button onClick={toggleTheme} className="btn-icon">
           {isDark ? '☀️' : '🌙'}
         </button>
       </nav>
@@ -261,7 +253,7 @@ export default function ProfilePage() {
       <div className="page-body mobile-pad" style={{ maxWidth: 600, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
         {/* ── 유저 정보 카드 ── */}
-        <div style={CARD_STYLE}>
+        <div className="card">
           {/* 아바타 + 이름 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             <div style={{ position: 'relative' }}>
@@ -323,10 +315,10 @@ export default function ProfilePage() {
                 style={{ flex: 1 }}
                 autoFocus
               />
-              <button onClick={handleSaveName} disabled={saving} style={{ padding: '0 20px', background: 'var(--primary)', color: 'white', fontWeight: 600, fontSize: 14, borderRadius: 12 }}>
+              <button onClick={handleSaveName} disabled={saving} style={{ padding: '0 20px', background: 'var(--primary)', color: 'white', fontWeight: 600, fontSize: 14, borderRadius: 12, flexShrink: 0 }}>
                 {saving ? '저장 중...' : '저장'}
               </button>
-              <button onClick={() => setEditingName(false)} style={{ padding: '0 16px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 14 }}>
+              <button onClick={() => setEditingName(false)} className="btn-secondary" style={{ padding: '0 16px', flexShrink: 0 }}>
                 취소
               </button>
             </div>
@@ -346,7 +338,7 @@ export default function ProfilePage() {
         </div>
 
         {/* ── 나의 통계 ── */}
-        <div style={CARD_STYLE}>
+        <div className="card">
           <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, marginBottom: 16, color: 'var(--text)' }}>
             나의 기록
           </h3>
@@ -399,7 +391,7 @@ export default function ProfilePage() {
 
         {/* ── 감정 잔디 그리드 ── */}
         {diaries.length > 0 && (
-          <div style={CARD_STYLE}>
+          <div className="card">
             <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, marginBottom: 4, color: 'var(--text)' }}>
               나의 감정 잔디
             </h3>
@@ -446,11 +438,11 @@ export default function ProfilePage() {
         )}
 
         {/* ── 관심사 설정 ── */}
-        <div style={CARD_STYLE}>
+        <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: editingPrefs ? 16 : 0 }}>
             <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, color: 'var(--text)' }}>관심사</h3>
             {!editingPrefs && (
-              <button onClick={() => setEditingPrefs(true)} style={{ padding: '6px 14px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 13, borderRadius: 10 }}>
+              <button onClick={() => setEditingPrefs(true)} className="btn-secondary" style={{ padding: '6px 14px', fontSize: 13, borderRadius: 10 }}>
                 ✏️ 수정
               </button>
             )}
@@ -553,7 +545,7 @@ export default function ProfilePage() {
                 <button onClick={handleSavePrefs} disabled={savingPrefs} style={{ flex: 1, padding: '12px 0', background: 'var(--primary)', color: 'white', fontWeight: 600, borderRadius: 12 }}>
                   {savingPrefs ? '저장 중...' : '저장하기'}
                 </button>
-                <button onClick={handleCancelPrefs} style={{ padding: '12px 20px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 12 }}>
+                <button onClick={handleCancelPrefs} className="btn-secondary">
                   취소
                 </button>
               </div>
@@ -564,7 +556,8 @@ export default function ProfilePage() {
         {/* ── 로그아웃 ── */}
         <button
           onClick={logout}
-          style={{ padding: '14px 0', background: '#fde8e8', color: '#e07070', fontWeight: 600, fontSize: 15, borderRadius: 14 }}
+          className="btn-danger-soft"
+          style={{ width: '100%', fontSize: 15, borderRadius: 14, padding: '14px 0' }}
         >
           로그아웃
         </button>

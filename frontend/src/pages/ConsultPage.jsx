@@ -8,15 +8,6 @@ import { useToast } from '../context/ToastContext';
 import { PERSONA_CONFIRM } from '../constants/persona';
 import BottomNav from '../components/BottomNav';
 
-// ── 공통 카드 스타일 ────────────────────────────────────────────────────────────
-const CARD_STYLE = {
-  background: 'var(--surface)',
-  borderRadius: 'var(--radius)',
-  padding: '20px 20px',
-  boxShadow: 'var(--shadow)',
-  border: '1px solid var(--border)',
-};
-
 export default function ConsultPage() {
   const navigate = useNavigate();
   const { isDark, toggleTheme } = useTheme();
@@ -109,19 +100,11 @@ export default function ConsultPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* ── 상단 네비게이션 바 ── */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        padding: '0 24px', height: 56,
-        background: 'var(--surface)',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-      }}>
+      <nav className="nav-top">
         {/* 뒤로가기 버튼 */}
         <button
           onClick={() => navigate('/diary')}
-          style={{ background: 'transparent', color: 'var(--text-muted)', padding: '6px 12px', fontSize: 14 }}
+          className="btn-ghost"
         >
           ← 일기로
         </button>
@@ -136,7 +119,7 @@ export default function ConsultPage() {
         {/* 다크모드 토글 버튼 */}
         <button
           onClick={toggleTheme}
-          style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 16, padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 10 }}
+          className="btn-icon"
           title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
         >
           {isDark ? '☀️' : '🌙'}
@@ -159,7 +142,7 @@ export default function ConsultPage() {
             </button>
 
             {/* 상세 카드 */}
-            <div style={{ ...CARD_STYLE, cursor: 'default' }}>
+            <div className="card" style={{ cursor: 'default' }}>
               {/* 날짜 */}
               <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
                 {new Date(selected.created_at).toLocaleDateString('ko-KR', {
@@ -191,7 +174,7 @@ export default function ConsultPage() {
               )}
 
               {/* 구분선 */}
-              <div style={{ borderTop: '1px solid var(--border)', margin: '20px 0' }} />
+              <div className="divider" />
 
               {/* AI 판정 결과 */}
               {selected.verdict && (
@@ -236,15 +219,7 @@ export default function ConsultPage() {
                       {/* copied 상태에 따라 버튼 텍스트 변경 */}
                     </button>
                   </div>
-                  <div style={{
-                    padding: '16px 20px',
-                    background: 'var(--bg)',
-                    borderRadius: 12,
-                    border: '1px solid var(--border)',
-                    lineHeight: 1.9,
-                    whiteSpace: 'pre-wrap',
-                    fontSize: 14,
-                  }}>
+                  <div className="content-block">
                     {selected.message_script}
                   </div>
                 </div>
@@ -255,13 +230,14 @@ export default function ConsultPage() {
             {confirmDeleteId === selected.id ? (
               <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
                 <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{confirm.deleteMsg}</span>
-                <button onClick={() => handleDelete(selected.id)} style={{ padding: '10px 18px', background: '#e08080', color: 'white', fontWeight: 600, fontSize: 13, borderRadius: 10 }}>{confirm.confirmBtn}</button>
-                <button onClick={() => setConfirmDeleteId(null)} style={{ padding: '10px 16px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 13, borderRadius: 10 }}>{confirm.cancelBtn}</button>
+                <button onClick={() => handleDelete(selected.id)} className="btn-danger">{confirm.confirmBtn}</button>
+                <button onClick={() => setConfirmDeleteId(null)} className="btn-danger-soft">{confirm.cancelBtn}</button>
               </div>
             ) : (
               <button
                 onClick={() => setConfirmDeleteId(selected.id)}
-                style={{ marginTop: 16, padding: '12px 20px', background: '#fde8e8', color: '#e07070', fontSize: 14, borderRadius: 12 }}
+                className="btn-danger-soft"
+                style={{ marginTop: 16 }}
               >
                 이 상담 삭제
               </button>
@@ -272,7 +248,7 @@ export default function ConsultPage() {
           /* ── 목록 화면 ── */
           <div>
             {/* ── 상담 입력 폼 ── */}
-            <form onSubmit={handleSubmit} style={{ ...CARD_STYLE, marginBottom: 28 }}>
+            <form onSubmit={handleSubmit} className="card" style={{ marginBottom: 28 }}>
               <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, marginBottom: 20, color: 'var(--text)' }}>
                 상황을 알려주세요
               </h3>
@@ -322,7 +298,7 @@ export default function ConsultPage() {
               <button
                 type="submit"
                 disabled={loading}
-                style={{ width: '100%', padding: '14px 0', background: 'var(--primary)', color: 'white', fontWeight: 600, fontSize: 15, borderRadius: 14 }}
+                className="btn-primary"
               >
                 {loading ? '💭 AI가 판단 중...' : '💌 판정받기'}
               </button>
@@ -330,7 +306,7 @@ export default function ConsultPage() {
 
             {/* ── AI 판정 결과 (상담 직후에만 표시) ── */}
             {result && (
-              <div style={{ ...CARD_STYLE, marginBottom: 28, border: '1.5px solid var(--primary-light)' }}>
+              <div className="card" style={{ marginBottom: 28, border: '1.5px solid var(--primary-light)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
                   <span style={{ fontSize: 22 }}>🎯</span>
                   <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>AI 판정 결과</h3>
@@ -373,16 +349,7 @@ export default function ConsultPage() {
                       {copied ? '✓ 복사됨!' : '복사'}
                     </button>
                   </div>
-                  <div style={{
-                    padding: '16px 20px',
-                    background: 'var(--bg)',
-                    borderRadius: 12,
-                    border: '1px solid var(--border)',
-                    lineHeight: 1.9,
-                    whiteSpace: 'pre-wrap',
-                    fontSize: 14,
-                    color: 'var(--text)',
-                  }}>
+                  <div className="content-block">
                     {result.message_script}
                   </div>
                 </div>
@@ -406,10 +373,10 @@ export default function ConsultPage() {
                   {consultations.map((c) => (
                     <div
                       key={c.id}
+                      className="card"
                       style={{
-                        ...CARD_STYLE,
                         padding: '16px 20px',
-                        cursor: 'pointer',            // 클릭 가능함을 손가락 커서로 표시
+                        cursor: 'pointer',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'flex-start',
@@ -434,16 +401,7 @@ export default function ConsultPage() {
                           {/* 60글자 넘으면 잘라서 ... 붙임 */}
                         </p>
                         {c.verdict && (
-                          <span style={{
-                            display: 'inline-block',
-                            background: 'var(--primary-light)',
-                            color: 'var(--primary-dark)',
-                            padding: '2px 12px',
-                            borderRadius: 20,
-                            fontSize: 12,
-                            fontWeight: 600,
-                            marginBottom: 6,
-                          }}>
+                          <span className="badge" style={{ marginBottom: 6 }}>
                             {c.verdict}
                           </span>
                         )}

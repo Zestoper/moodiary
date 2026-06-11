@@ -26,14 +26,6 @@ const WMO = {
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 // 인덱스 0=일요일, 6=토요일. 달력 헤더에 표시
 
-// ── 공통 카드 스타일 ─────────────────────────────────────────────────────────────
-const CARD_STYLE = {
-  background: 'var(--surface)',
-  borderRadius: 'var(--radius)',
-  padding: '20px 24px',
-  boxShadow: 'var(--shadow)',
-  border: '1px solid var(--border)',
-};
 
 export default function CalendarPage() {
   const navigate = useNavigate();
@@ -210,18 +202,10 @@ export default function CalendarPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* ── 상단 네비게이션 ── */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
-        padding: '0 24px', height: 56,
-        background: 'var(--surface)',
-        borderBottom: '1px solid var(--border)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-      }}>
+      <nav className="nav-top">
         <button
           onClick={() => navigate('/diary')}
-          style={{ background: 'transparent', color: 'var(--text-muted)', padding: '6px 12px', fontSize: 14 }}
+          className="btn-ghost"
         >
           ← 일기로
         </button>
@@ -233,7 +217,7 @@ export default function CalendarPage() {
         </div>
         <button
           onClick={toggleTheme}
-          style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 16, padding: '6px 10px', border: '1px solid var(--border)', borderRadius: 10 }}
+          className="btn-icon"
           title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
         >
           {isDark ? '☀️' : '🌙'}
@@ -265,7 +249,7 @@ export default function CalendarPage() {
         {monthDiaries.length > 0 ? (
           <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
             {/* 일기 수 */}
-            <div style={{ ...CARD_STYLE, padding: '12px 20px', flex: 1, minWidth: 100, textAlign: 'center' }}>
+            <div className="card" style={{ padding: '12px 20px', flex: 1, minWidth: 100, textAlign: 'center' }}>
               <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>작성한 일기</p>
               <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--primary)', fontFamily: 'Nanum Myeongjo, serif' }}>
                 {monthDiaries.length}개
@@ -273,7 +257,7 @@ export default function CalendarPage() {
             </div>
             {/* 평균 감정 점수 */}
             {avgScore && (
-              <div style={{ ...CARD_STYLE, padding: '12px 20px', flex: 1, minWidth: 100, textAlign: 'center' }}>
+              <div className="card" style={{ padding: '12px 20px', flex: 1, minWidth: 100, textAlign: 'center' }}>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>평균 감정</p>
                 <p style={{ fontSize: 20, fontWeight: 700, color: emotionColor(Math.round(avgScore)) || 'var(--primary)', fontFamily: 'Nanum Myeongjo, serif' }}>
                   {avgScore}점
@@ -282,7 +266,7 @@ export default function CalendarPage() {
             )}
             {/* 이번 달 대표 감정 태그 */}
             {topTag && (
-              <div style={{ ...CARD_STYLE, padding: '12px 20px', flex: 1, minWidth: 100, textAlign: 'center' }}>
+              <div className="card" style={{ padding: '12px 20px', flex: 1, minWidth: 100, textAlign: 'center' }}>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>대표 감정</p>
                 <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--primary)', fontFamily: 'Nanum Myeongjo, serif' }}>
                   {topTag}
@@ -298,7 +282,7 @@ export default function CalendarPage() {
         )}
 
         {/* ── 달력 본체 ── */}
-        <div className="mcard" style={{ ...CARD_STYLE, marginBottom: 20 }}>
+        <div className="mcard card" style={{ marginBottom: 20 }}>
           {/* 요일 헤더 */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 8 }}>
             {WEEKDAYS.map((d, i) => (
@@ -422,7 +406,7 @@ export default function CalendarPage() {
           // 영역 채우기: 선 아래를 채우는 path. Z로 닫기
 
           return (
-            <div style={{ ...CARD_STYLE, marginBottom: 20 }}>
+            <div className="card" style={{ marginBottom: 20 }}>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12, fontWeight: 500 }}>
                 이번 달 감정 추이
               </p>
@@ -472,7 +456,7 @@ export default function CalendarPage() {
 
         {/* ── 날씨-감정 상관관계 ── */}
         {weatherStats.length > 0 && (
-          <div style={{ ...CARD_STYLE, marginBottom: 20 }}>
+          <div className="card" style={{ marginBottom: 20 }}>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 10, fontWeight: 500 }}>
               날씨별 평균 감정
             </p>
@@ -490,7 +474,7 @@ export default function CalendarPage() {
 
         {/* ── 월간 감정 리포트 ── */}
         {monthDiaries.length > 0 && (
-          <div style={{ ...CARD_STYLE, marginBottom: 20 }}>
+          <div className="card" style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: report ? 14 : 0 }}>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
                 {year}년 {month + 1}월 감정 리포트
@@ -524,11 +508,10 @@ export default function CalendarPage() {
 
         {/* ── 선택된 일기 프리뷰 ── */}
         {selectedDiary && (
-          <div style={{
-            ...CARD_STYLE,
-            borderLeft: `4px solid ${emotionColor(selectedDiary.emotion_score) || 'var(--primary)'}`,
-            // 감정 점수 색상으로 왼쪽 강조 테두리
-          }}>
+          <div
+            className="card"
+            style={{ borderLeft: `4px solid ${emotionColor(selectedDiary.emotion_score) || 'var(--primary)'}` }}
+          >
             {/* 상단: 제목 + 감정 점수 뱃지 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8, gap: 8 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
