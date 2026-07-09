@@ -1,7 +1,3 @@
-// ─── 관리자 페이지 ────────────────────────────────────────────────────────────────
-// is_admin=true 유저만 접근 가능. 백엔드에서도 403 처리됨.
-// 탭: 대시보드 / 유저 목록 / AI 사용량 / 결제 내역
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAdminStats, getAdminUsers, getAdminAiUsage, getAdminPayments, grantCredits } from '../api/admin';
@@ -10,7 +6,6 @@ import BottomNav from '../components/BottomNav';
 
 const TABS = ['대시보드', '유저 목록', 'AI 사용량', '결제 내역'];
 
-// 통계 카드 1개
 function StatCard({ label, value, unit = '' }) {
   return (
     <div style={{
@@ -25,7 +20,6 @@ function StatCard({ label, value, unit = '' }) {
   );
 }
 
-// AI 사용량 바
 function UsageBar({ label, value, max }) {
   const pct = max > 0 ? Math.round((value / max) * 100) : 0;
   return (
@@ -49,10 +43,9 @@ export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [aiUsage, setAiUsage] = useState(null);
   const [payments, setPayments] = useState([]);
-  const [grantInputs, setGrantInputs] = useState({}); // { [user_id]: credits 입력값 }
+  const [grantInputs, setGrantInputs] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // 탭 전환 시 데이터 로드
   useEffect(() => {
     setLoading(true);
     const load = async () => {
@@ -93,7 +86,7 @@ export default function AdminPage() {
     try {
       const result = await grantCredits(userId, amount);
       addToast(`${result.credits_granted}크레딧 지급 완료 (총 ${result.total_credits}개)`, 'success');
-      // 유저 목록 갱신
+
       const data = await getAdminUsers();
       setUsers(data.users || []);
       setGrantInputs((prev) => ({ ...prev, [userId]: '' }));
@@ -108,7 +101,7 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      {/* 헤더 */}
+
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'var(--surface)', borderBottom: '1px solid var(--border)',
@@ -122,7 +115,7 @@ export default function AdminPage() {
       </nav>
 
       <div className="page-body" style={{ maxWidth: 900, margin: '0 auto', padding: '28px 16px' }}>
-        {/* 탭 */}
+
         <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid var(--border)', overflowX: 'auto' }}>
           {TABS.map((t) => (
             <button
@@ -143,7 +136,6 @@ export default function AdminPage() {
 
         {loading && <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 40 }}>불러오는 중...</p>}
 
-        {/* ── 대시보드 탭 ─────────────────────────────────────────────── */}
         {!loading && tab === '대시보드' && stats && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
             <StatCard label="총 가입자" value={stats.total_users} unit="명" />
@@ -154,7 +146,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── 유저 목록 탭 ────────────────────────────────────────────── */}
         {!loading && tab === '유저 목록' && (
           <div>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 12 }}>총 {users.length}명</p>
@@ -215,7 +206,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── AI 사용량 탭 ────────────────────────────────────────────── */}
         {!loading && tab === 'AI 사용량' && aiUsage && (
           <div style={{ maxWidth: 480 }}>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 20 }}>
@@ -236,7 +226,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── 결제 내역 탭 ────────────────────────────────────────────── */}
         {!loading && tab === '결제 내역' && (
           <div>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 12 }}>최근 {payments.length}건</p>

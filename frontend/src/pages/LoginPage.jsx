@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  // 'checking' | 'ok' | 'error'
+
   const [serverStatus, setServerStatus] = useState('checking');
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function LoginPage() {
     try {
       if (isRegister) {
         await register(email, username, password);
-        // 가입 직후 자동 로그인 + 온보딩으로 이동
+
         const loginData = await login(email, password);
         authLogin(null, loginData.access_token);
         navigate('/onboarding');
@@ -74,7 +74,7 @@ export default function LoginPage() {
         padding: '48px 40px',
         boxShadow: 'var(--shadow)',
       }}>
-        {/* 로고 영역 */}
+
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <div style={{ fontSize: 40, marginBottom: 8 }}>🌿</div>
           <h1 style={{
@@ -99,7 +99,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* 탭 전환 */}
         <div style={{ display: 'flex', marginBottom: 28, background: '#f5ece4', borderRadius: 12, padding: 4 }}>
           {['로그인', '회원가입'].map((label, i) => (
             <button
@@ -119,7 +118,6 @@ export default function LoginPage() {
           ))}
         </div>
 
-        {/* 폼 */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <input type="email" placeholder="이메일" value={email} onChange={(e) => setEmail(e.target.value)} />
           {isRegister && (

@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext'; // 토스트 알림 전역 제공
+import { ToastProvider } from './context/ToastContext';
 import LoginPage from './pages/LoginPage';
 import DiaryPage from './pages/DiaryPage';
 import ChatPage from './pages/ChatPage';
@@ -15,7 +15,7 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      {/* ToastProvider: 모든 페이지에서 useToast() 사용 가능하게 감쌈 */}
+      {}
       <ToastProvider>
         <BrowserRouter>
           <Routes>

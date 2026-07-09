@@ -1,7 +1,3 @@
-// ─── 크레딧 충전 페이지 ───────────────────────────────────────────────────────────
-// PortOne(아임포트) SDK로 결제 → 서버 검증 → 크레딧 지급
-// PortOne 미설정 시 테스트 모드: 결제창 없이 바로 크레딧 지급
-
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPackages, verifyPayment, getPaymentHistory } from '../api/payment';
@@ -17,7 +13,6 @@ const NAV_ITEMS = [
   { label: '프로필', path: '/profile' },
 ];
 
-// 기능별 무료 횟수 안내 텍스트
 const FREE_QUOTA_INFO = [
   { feature: '맞춤 솔루션', limit: '월 3회' },
   { feature: '연애 상담',   limit: '월 5회' },
@@ -31,11 +26,11 @@ export default function PaymentPage() {
 
   const [packages, setPackages] = useState([]);
   const [history, setHistory] = useState([]);
-  const [paying, setPaying] = useState(null); // 현재 결제 중인 package_id
+  const [paying, setPaying] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // PortOne IMP SDK 스크립트 동적 로드
+
     if (!window.IMP) {
       const script = document.createElement('script');
       script.src = 'https://cdn.iamport.kr/v1/iamport.js';
@@ -54,13 +49,12 @@ export default function PaymentPage() {
   const handlePurchase = async (pkg) => {
     setPaying(pkg.id);
     try {
-      // 주문 ID 생성: 서버가 발급하지 않고 클라이언트에서 생성 (UUID 대신 timestamp 기반)
+
       const merchant_uid = `moodiary_${Date.now()}`;
 
-      // PortOne 키가 없으면 테스트 모드: 실제 결제창 없이 서버에 바로 전달
       const imp_key = process.env.REACT_APP_PORTONE_IMP_KEY;
       if (!imp_key || imp_key === 'your_imp_key_here') {
-        // 테스트 모드: imp_uid를 임시 생성해서 서버에 전달 (서버에서 test 상태로 처리)
+
         const result = await verifyPayment(`test_${Date.now()}`, merchant_uid, pkg.id);
         if (result.success) {
           await refreshUser();
@@ -71,7 +65,6 @@ export default function PaymentPage() {
         return;
       }
 
-      // PortOne 결제창 호출
       if (!window.IMP) {
         addToast('결제 모듈 로딩 중이에요. 잠시 후 다시 시도해주세요.', 'error');
         return;
@@ -81,11 +74,11 @@ export default function PaymentPage() {
       await new Promise((resolve, reject) => {
         window.IMP.request_pay(
           {
-            pg: 'html5_inicis', // PG사. PortOne 대시보드에서 설정한 PG사로 변경
-            pay_method: 'card',            // 결제 수단
-            merchant_uid,                  // 주문 고유 ID
-            name: `Moodiary ${pkg.label}`, // 상품명
-            amount: pkg.amount,            // 결제 금액 (원)
+            pg: 'html5_inicis',
+            pay_method: 'card',
+            merchant_uid,
+            name: `Moodiary ${pkg.label}`,
+            amount: pkg.amount,
             buyer_email: user?.email || '',
             buyer_name: user?.username || '',
           },
@@ -122,7 +115,7 @@ export default function PaymentPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
-      {/* 네비게이션 */}
+
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'var(--surface)', borderBottom: '1px solid var(--border)',
@@ -157,7 +150,6 @@ export default function PaymentPage() {
           크레딧 1개로 AI 기능 1회를 추가로 이용할 수 있어요.
         </p>
 
-        {/* 무료 제공 안내 */}
         <div style={{
           background: 'var(--surface)', borderRadius: 'var(--radius)',
           border: '1px solid var(--border)', padding: '16px 20px', marginBottom: 28,
@@ -178,7 +170,6 @@ export default function PaymentPage() {
           </div>
         </div>
 
-        {/* 패키지 카드 */}
         {loading ? (
           <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>불러오는 중...</p>
         ) : (
@@ -213,7 +204,6 @@ export default function PaymentPage() {
           </div>
         )}
 
-        {/* 결제 내역 */}
         <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>결제 내역</h3>
         {history.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>아직 결제 내역이 없어요.</p>

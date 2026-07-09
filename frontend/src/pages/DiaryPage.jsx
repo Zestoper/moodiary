@@ -9,8 +9,6 @@ import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../context/ToastContext';
 import BottomNav from '../components/BottomNav';
 
-// ── WMO 날씨 코드 → 이모지/설명 매핑 ────────────────────────────────────────────
-// WMO: 세계기상기구 표준 날씨 코드. Open-Meteo API가 이 코드를 반환함
 const WMO = {
   0: { emoji: '☀️', text: '맑음' }, 1: { emoji: '🌤️', text: '대체로 맑음' },
   2: { emoji: '⛅', text: '구름 조금' }, 3: { emoji: '☁️', text: '흐림' },
@@ -23,7 +21,6 @@ const WMO = {
   95: { emoji: '⛈️', text: '뇌우' }, 96: { emoji: '⛈️', text: '뇌우' }, 99: { emoji: '⛈️', text: '뇌우' },
 };
 
-// ── AI 페르소나 목록 ───────────────────────────────────────────────────────────────
 const AI_PERSONAS = [
   { key: 'friend',      emoji: '🌿', name: '친구',   desc: '공감하며 반말로' },
   { key: 'mentor',      emoji: '📚', name: '선배',   desc: '따뜻한 조언' },
@@ -33,7 +30,6 @@ const AI_PERSONAS = [
   { key: 'realist',    emoji: '🔥', name: '현실러', desc: '팩트로 직격' },
 ];
 
-// ── 글쓰기 프롬프트 목록 (30개) ───────────────────────────────────────────────────
 const PROMPTS = [
   '오늘 가장 기억에 남는 대화는?', '지금 가장 고마운 사람은 누구인가요?',
   '오늘 가장 힘들었던 순간, 어떻게 넘겼나요?', '나 자신에게 칭찬해주고 싶은 것은?',
@@ -59,54 +55,43 @@ const NAV_STYLE = {
   position: 'sticky', top: 0, zIndex: 100,
 };
 
-
 export default function DiaryPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, user, refreshUser } = useAuth();
   const { isDark, toggleTheme } = useTheme();
-  const { addToast } = useToast(); // 알림 함수
+  const { addToast } = useToast();
 
   const [diaries, setDiaries] = useState([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null); // 현재 상세 보기 중인 일기
+  const [selected, setSelected] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null); // 인라인 삭제 확인 중인 일기 ID
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [username, setUsername] = useState('');
   const [search, setSearch] = useState('');
-  // search: 검색어. 실시간으로 diaries 배열 필터링에 사용
 
-  // 수정 모드 상태
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
 
-  // 음성 입력 상태
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
-  // 초안 자동저장 상태
-  const [draftRestored, setDraftRestored] = useState(false); // 초안 복원 알림 표시 여부
-  const draftTimerRef = useRef(null); // debounce 타이머
+  const [draftRestored, setDraftRestored] = useState(false);
+  const draftTimerRef = useRef(null);
 
-  // 날씨 상태 (일기 작성 폼 열릴 때 자동으로 가져옴)
   const [weatherInfo, setWeatherInfo] = useState(null);
-  // weatherInfo: { code: 0, temperature: 21.3, emoji: '☀️', text: '맑음' } | null
 
-  // 글쓰기 프롬프트 상태
   const [promptIdx, setPromptIdx] = useState(() => Math.floor(Math.random() * PROMPTS.length));
-  // 새로고침마다 다른 프롬프트로 시작
 
-  // AI 페르소나 선택 (localStorage에 저장해서 ChatPage와 공유)
   const [persona, setPersona] = useState(() => localStorage.getItem('ai_persona') || 'friend');
 
   useEffect(() => {
     localStorage.setItem('ai_persona', persona);
   }, [persona]);
 
-  // 폼 열릴 때 저장된 초안 복원
   useEffect(() => {
     if (!showForm) return;
     const saved = localStorage.getItem('diary_draft');
@@ -117,13 +102,12 @@ export default function DiaryPage() {
         setTitle(t || '');
         setContent(c || '');
         setDraftRestored(true);
-        // 3초 후 알림 숨김
+
         setTimeout(() => setDraftRestored(false), 3000);
       }
     } catch {}
   }, [showForm]);
 
-  // 제목/내용 변경 시 500ms 후 localStorage에 초안 저장 (debounce)
   useEffect(() => {
     if (!showForm) return;
     clearTimeout(draftTimerRef.current);
@@ -135,10 +119,9 @@ export default function DiaryPage() {
     return () => clearTimeout(draftTimerRef.current);
   }, [title, content, showForm]);
 
-  // 음악 추천 상태
   const [music, setMusic] = useState(null);
   const [musicLoading, setMusicLoading] = useState(false);
-  const [musicGenres, setMusicGenres] = useState([]);  // 유저 선호 장르
+  const [musicGenres, setMusicGenres] = useState([]);
   const [solutionLoading, setSolutionLoading] = useState(false);
 
   const now = new Date();
@@ -149,7 +132,6 @@ export default function DiaryPage() {
     fetchDiaries();
   }, []);
 
-  // 캘린더에서 넘어올 때 location.state.openId로 해당 일기 자동 선택
   useEffect(() => {
     const openId = location.state?.openId;
     if (!openId || diaries.length === 0) return;
@@ -167,14 +149,13 @@ export default function DiaryPage() {
             setMusicGenres(prefs.music_genres || []);
           } catch {}
         }
-        // 크레딧·관리자 여부 등 최신 유저 정보를 auth context에도 반영
+
         refreshUser();
       } catch { }
     };
     loadUser();
   }, []);
 
-  // 일기 선택 시 음악 추천 자동 fetch
   useEffect(() => {
     if (!selected?.emotion_score) { setMusic(null); return; }
     const fetchMusic = async () => {
@@ -195,49 +176,46 @@ export default function DiaryPage() {
     } catch { navigate('/login'); }
   };
 
-  // ── 날씨 자동 기록 ──────────────────────────────────────────────────────────────
   const fetchWeather = () => {
-    if (!navigator.geolocation) return; // 브라우저 미지원 시 무시
+    if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
         try {
-          // Open-Meteo: 무료, API 키 불필요. current에 원하는 필드 명시
+
           const url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current=temperature_2m,weather_code`;
           const res = await fetch(url);
           const json = await res.json();
           const code = json.current.weather_code;
           const temp = Math.round(json.current.temperature_2m);
           setWeatherInfo({ code, temperature: temp, ...(WMO[code] || { emoji: '🌡️', text: '날씨' }) });
-        } catch { /* 날씨 실패해도 일기 작성은 계속 가능 */ }
+        } catch
       },
-      () => { /* 위치 권한 거부도 무시 */ },
+      () => ,
       { timeout: 5000 },
     );
   };
 
-  // ── 검색 필터 ─────────────────────────────────────────────────────────────────
   const filteredDiaries = diaries.filter((d) => {
-    if (!search.trim()) return true; // 검색어 없으면 전체 표시
+    if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
       d.title.toLowerCase().includes(q) ||
       d.content.toLowerCase().includes(q) ||
       (d.emotion_tags && d.emotion_tags.toLowerCase().includes(q))
     );
-    // 제목 / 본문 / 감정 태그 중 하나라도 검색어 포함하면 표시
-    // toLowerCase(): 대소문자 구분 없이 검색
+
   });
 
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!title || !content) return;
-    stopListening(); // 저장 시 음성 입력 중이면 종료
+    stopListening();
     setLoading(true);
     try {
       const newDiary = await createDiary(title, content, weatherInfo?.code ?? null, weatherInfo?.temperature ?? null);
       setDiaries([newDiary, ...diaries]);
       setTitle(''); setContent(''); setShowForm(false); setWeatherInfo(null); setSearch('');
-      localStorage.removeItem('diary_draft'); // 저장 완료 → 초안 삭제
+      localStorage.removeItem('diary_draft');
       addToast('일기가 저장됐어요 🌿', 'success');
     } catch {
       addToast('저장에 실패했어요', 'error');
@@ -256,18 +234,16 @@ export default function DiaryPage() {
     }
   };
 
-  // ── 수정 시작: 폼에 기존 값 채우기 ──────────────────────────────────────────
   const handleEditStart = () => {
-    setEditTitle(selected.title);     // 기존 제목 미리 채움
-    setEditContent(selected.content); // 기존 본문 미리 채움
-    setIsEditing(true);               // 수정 모드로 전환
+    setEditTitle(selected.title);
+    setEditContent(selected.content);
+    setIsEditing(true);
   };
 
-  // ── 수정 저장 ─────────────────────────────────────────────────────────────────
   const handleEditSave = async (e) => {
     e.preventDefault();
     if (!editTitle || !editContent) return;
-    stopListening(); // 저장 시 음성 입력 중이면 종료
+    stopListening();
     setLoading(true);
     try {
       const updated = await updateDiary(selected.id, editTitle, editContent);
@@ -280,7 +256,6 @@ export default function DiaryPage() {
     } finally { setLoading(false); }
   };
 
-  // ── 맞춤 솔루션 요청 ──────────────────────────────────────────────────────────
   const handleGetSolution = async () => {
     setSolutionLoading(true);
     try {
@@ -299,7 +274,6 @@ export default function DiaryPage() {
     }
   };
 
-  // ── 음성 입력 ─────────────────────────────────────────────────────────────────
   const handleVoiceToggle = (setter) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -308,18 +282,18 @@ export default function DiaryPage() {
     }
     if (isListening) {
       recognitionRef.current?.stop();
-      // stop()을 호출하면 recognition.onend가 자동으로 실행되어 setIsListening(false)가 호출됨
+
       return;
     }
     const recognition = new SpeechRecognition();
-    recognition.lang = 'ko-KR';      // 한국어 인식
-    recognition.continuous = true;   // 말을 멈춰도 자동 종료 안 함
-    recognition.interimResults = false; // 최종 인식 결과만 받음 (중간 결과 제외)
+    recognition.lang = 'ko-KR';
+    recognition.continuous = true;
+    recognition.interimResults = false;
     recognition.onresult = (e) => {
-      // e.results: 인식된 결과 배열. 마지막 결과만 추가
+
       const transcript = e.results[e.results.length - 1][0].transcript;
       setter((prev) => prev + (prev.endsWith('\n') || prev === '' ? '' : ' ') + transcript);
-      // 기존 내용 뒤에 공백 한 칸 추가 후 인식된 텍스트 이어붙임
+
     };
     recognition.onerror = () => {
       addToast('음성 인식에 실패했어요', 'error');
@@ -336,9 +310,8 @@ export default function DiaryPage() {
     setIsListening(false);
   };
 
-  // ── PDF 내보내기 ──────────────────────────────────────────────────────────────
   const escapeHtml = (str) =>
-    // XSS 방지: 일기 내용에 HTML 특수문자가 있어도 안전하게 출력
+
     String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -356,7 +329,7 @@ export default function DiaryPage() {
 <html><head>
   <meta charset="utf-8">
   <title>${escapeHtml(diary.title)}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+  <link href="https:
   <style>
     body { font-family: 'Nanum Myeongjo', serif; max-width: 580px; margin: 60px auto; color: #2d2016; line-height: 1.9; }
     h1 { font-size: 26px; border-bottom: 1px solid #e0d0c0; padding-bottom: 12px; margin-bottom: 6px; }
@@ -564,7 +537,7 @@ export default function DiaryPage() {
                       })().map(({ label, query }) => (
                         <a
                           key={label}
-                          href={`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`}
+                          href={`https:
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
@@ -605,9 +578,9 @@ export default function DiaryPage() {
             )}
           </div>
         ) : (
-          /* ── 일기 목록 ── */
+
           <div>
-            {/* ── AI 페르소나 선택 카드 ── */}
+
             <div className="card" style={{ cursor: 'default', marginBottom: 24 }}>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>💬 AI 채팅 말투 선택</p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -616,7 +589,7 @@ export default function DiaryPage() {
                     key={p.key}
                     onClick={() => {
                       setPersona(p.key);
-                      localStorage.setItem('ai_persona', p.key); // 즉시 저장 (useEffect 대기 없이)
+                      localStorage.setItem('ai_persona', p.key);
                     }}
                     style={{
                       flex: '1 0 auto',
@@ -654,7 +627,7 @@ export default function DiaryPage() {
                     setWeatherInfo(null);
                     setTitle('');
                     setContent('');
-                    localStorage.removeItem('diary_draft'); // 취소 시 초안 삭제
+                    localStorage.removeItem('diary_draft');
                   } else {
                     fetchWeather();
                   }
@@ -666,25 +639,23 @@ export default function DiaryPage() {
               </button>
             </div>
 
-            {/* ── 검색창 ── */}
             {diaries.length > 0 && (
               <div style={{ position: 'relative', marginBottom: 20 }}>
                 <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 15, pointerEvents: 'none' }}>🔍</span>
-                {/* 검색 아이콘. pointerEvents: 'none': 아이콘이 input 클릭을 가로막지 않게 */}
+
                 <input
                   type="text"
                   placeholder="제목, 내용, 감정 태그로 검색"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  style={{ paddingLeft: 40 }} // 아이콘 공간 확보
+                  style={{ paddingLeft: 40 }}
                 />
               </div>
             )}
 
-            {/* ── 일기 작성 폼 ── */}
             {showForm && (
               <form onSubmit={handleCreate} className="card" style={{ cursor: 'default', marginBottom: 24 }}>
-                {/* 초안 복원 알림 */}
+
                 {draftRestored && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, padding: '8px 12px', background: 'var(--primary-light)', borderRadius: 8, fontSize: 13 }}>
                     <span style={{ color: 'var(--primary-dark)' }}>이전에 작성하던 초안을 불러왔어요</span>
@@ -697,7 +668,7 @@ export default function DiaryPage() {
                     </button>
                   </div>
                 )}
-                {/* 헤더 행: 제목 + 날씨 배지 */}
+
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, gap: 8 }}>
                   <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', flex: 1, minWidth: 0 }}>오늘 하루를 기록해요</h3>
                   {weatherInfo && (
@@ -706,7 +677,7 @@ export default function DiaryPage() {
                     </span>
                   )}
                 </div>
-                {/* 글쓰기 프롬프트 */}
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, padding: '10px 14px', background: 'var(--bg)', borderRadius: 10, border: '1px solid var(--border)' }}>
                   <span style={{ fontSize: 13, color: 'var(--text-muted)', flex: 1 }}>✍️ {PROMPTS[promptIdx]}</span>
                   <button
@@ -719,7 +690,7 @@ export default function DiaryPage() {
                   </button>
                 </div>
                 <input placeholder="제목" value={title} onChange={(e) => setTitle(e.target.value)} style={{ marginBottom: 12 }} />
-                {/* textarea를 relative 컨테이너로 감싸서 마이크 버튼을 우하단에 절대 위치로 배치 */}
+
                 <div style={{ position: 'relative', marginBottom: 16 }}>
                   <textarea
                     placeholder="오늘 어떤 하루였나요?"
@@ -739,7 +710,7 @@ export default function DiaryPage() {
                       color: isListening ? 'white' : 'var(--primary-dark)',
                       border: 'none', cursor: 'pointer',
                       animation: isListening ? 'blink 1s step-end infinite' : 'none',
-                      // blink: 녹음 중임을 시각적으로 표시 (index.css에 정의된 keyframes 재활용)
+
                     }}
                   >
                     🎤
@@ -751,12 +722,11 @@ export default function DiaryPage() {
               </form>
             )}
 
-            {/* ── 일기 목록 ── */}
             {filteredDiaries.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>{search ? '🔍' : '📔'}</div>
                 <p>{search ? `"${search}" 검색 결과가 없어요` : '아직 일기가 없어요. 첫 일기를 써보세요!'}</p>
-                {/* 검색 중이면 "검색 결과 없음", 아니면 "일기 없음" 문구 */}
+
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

@@ -1,6 +1,3 @@
-# ─── 관리자 전용 API ─────────────────────────────────────────────────────────────
-# is_admin=True 유저만 접근 가능. 통계 / 유저 목록 / AI 사용량 / 결제 내역 / 크레딧 수동 지급
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import func
@@ -16,25 +13,20 @@ from ..routers.auth import get_current_user
 
 router = APIRouter()
 
-
-# ── 관리자 권한 확인 의존성 ────────────────────────────────────────────────────────
 def get_admin_user(current_user: User = Depends(get_current_user)) -> User:
     """is_admin=True가 아니면 403 에러 발생. 모든 관리자 엔드포인트에 Depends로 주입"""
     if not current_user.is_admin:
         raise HTTPException(status_code=403, detail="관리자 권한이 필요합니다")
     return current_user
 
-
-# ── 크레딧 수동 지급 요청 바디 스키마 ─────────────────────────────────────────────
 class GrantCreditsRequest(BaseModel):
-    user_id: int   # 지급 대상 유저 ID
-    credits: int   # 지급할 크레딧 수
-
+    user_id: int
+    credits: int
 
 @router.get("/stats")
 def get_stats(
     db: Session = Depends(get_db),
-    _: User = Depends(get_admin_user),  # 관리자만 접근
+    _: User = Depends(get_admin_user),
 ):
     """대시보드 요약 통계: 총 유저 수, 오늘 신규 가입, 총 일기 수, 총 수익, AI 사용 횟수"""
     today_start = datetime.combine(date.today(), datetime.min.time())
@@ -53,14 +45,13 @@ def get_stats(
         "total_ai_uses": total_ai_uses,
     }
 
-
 @router.get("/users")
 def get_users(
     db: Session = Depends(get_db),
     _: User = Depends(get_admin_user),
 ):
     """유저 목록. 각 유저의 일기 수와 함께 반환"""
-    # 서브쿼리로 유저별 일기 수 집계
+
     diary_counts = (
         db.query(Diary.user_id, func.count(Diary.id).label("diary_count"))
         .group_by(Diary.user_id)
@@ -97,7 +88,6 @@ def get_users(
         ]
     }
 
-
 @router.get("/ai-usage")
 def get_ai_usage(
     db: Session = Depends(get_db),
@@ -122,7 +112,6 @@ def get_ai_usage(
             "monthly_report": usage_map.get("monthly_report", 0),
         },
     }
-
 
 @router.get("/payments")
 def get_all_payments(
@@ -153,7 +142,6 @@ def get_all_payments(
             for p, email, username in results
         ]
     }
-
 
 @router.post("/credits")
 def grant_credits(

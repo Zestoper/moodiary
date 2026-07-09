@@ -1,6 +1,3 @@
-// ─── 프로필 페이지 ────────────────────────────────────────────────────────────────
-// 유저 정보 표시, 닉네임 수정, 아바타 선택, 계정 통계, 잔디 그리드
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -8,17 +5,15 @@ import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../context/ToastContext';
 import { getMe } from '../api/auth';
 import { getDiaries } from '../api/diary';
-import api from '../api/axios'; // 닉네임 수정 API 직접 호출
+import api from '../api/axios';
 import BottomNav from '../components/BottomNav';
 
-// 선택 가능한 아바타 이모지 목록
 const AVATARS = ['🌿', '🌸', '🦊', '🐻', '🌙', '☀️', '🦋', '🌊', '🍀', '🎵', '🔥', '⭐'];
 
 const MUSIC_GENRES = [
   '팝', 'K-POP', '발라드', '힙합', 'R&B', '인디', '재즈', '클래식', '록', 'EDM', '트로트', 'OST',
 ];
 
-// 관심사 카테고리 (온보딩과 동일)
 const CATEGORIES = [
   { key: '음악 듣기',        icon: '🎵' },
   { key: '영화/드라마',      icon: '🎬' },
@@ -40,22 +35,20 @@ export default function ProfilePage() {
   const { isDark, toggleTheme } = useTheme();
   const { addToast } = useToast();
 
-  const [user, setUser] = useState(null);       // 유저 정보 { id, email, username, created_at }
-  const [diaries, setDiaries] = useState([]);   // 전체 일기 목록 (통계 계산용)
-  const [editingName, setEditingName] = useState(false); // 닉네임 수정 모드
-  const [newUsername, setNewUsername] = useState('');    // 수정할 닉네임 입력값
+  const [user, setUser] = useState(null);
+  const [diaries, setDiaries] = useState([]);
+  const [editingName, setEditingName] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
   const [saving, setSaving] = useState(false);
   const [avatar, setAvatar] = useState(() => localStorage.getItem('profile_avatar') || '🌿');
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
-  // 관심사 상태
   const [likes, setLikes] = useState(new Set());
   const [dislikes, setDislikes] = useState(new Set());
   const [musicGenres, setMusicGenres] = useState(new Set());
   const [editingPrefs, setEditingPrefs] = useState(false);
   const [savingPrefs, setSavingPrefs] = useState(false);
 
-  // 오늘 날짜
   const now = new Date();
   const days = ['일', '월', '화', '수', '목', '금', '토'];
   const today = `${now.getMonth() + 1}월 ${now.getDate()}일 ${days[now.getDay()]}요일`;
@@ -64,10 +57,10 @@ export default function ProfilePage() {
     const load = async () => {
       try {
         const [me, diaryData] = await Promise.all([getMe(), getDiaries()]);
-        // Promise.all: 두 API를 동시에 호출. 둘 다 완료될 때까지 기다림 (순차 호출보다 빠름)
+
         setUser(me);
         setDiaries(diaryData);
-        setNewUsername(me.username); // 수정 폼 초기값
+        setNewUsername(me.username);
       } catch {
         navigate('/login');
       }
@@ -75,13 +68,11 @@ export default function ProfilePage() {
     load();
   }, []);
 
-  // ── 통계 계산 ────────────────────────────────────────────────────────────────
   const scoredDiaries = diaries.filter((d) => d.emotion_score);
   const avgScore = scoredDiaries.length > 0
     ? (scoredDiaries.reduce((sum, d) => sum + d.emotion_score, 0) / scoredDiaries.length).toFixed(1)
     : null;
 
-  // 가장 많이 나온 감정 태그 찾기
   const allTags = diaries
     .filter((d) => d.emotion_tags)
     .flatMap((d) => d.emotion_tags.split(',').map((t) => t.trim()));
@@ -89,7 +80,6 @@ export default function ProfilePage() {
   allTags.forEach((t) => { tagCount[t] = (tagCount[t] || 0) + 1; });
   const topTag = Object.entries(tagCount).sort((a, b) => b[1] - a[1])[0]?.[0];
 
-  // 연속 작성일 계산 (오늘 포함 최근 연속 기록)
   const streak = (() => {
     const writtenDays = new Set(diaries.map((d) => {
       const date = new Date(d.created_at);
@@ -106,7 +96,6 @@ export default function ProfilePage() {
     return count;
   })();
 
-  // user 로드 시 저장된 관심사 파싱
   useEffect(() => {
     if (!user?.preferences) return;
     try {
@@ -117,7 +106,6 @@ export default function ProfilePage() {
     } catch {}
   }, [user]);
 
-  // ── 관심사 토글 ──────────────────────────────────────────────────────────────
   const toggleLike = (key) => {
     setLikes((prev) => { const next = new Set(prev); next.has(key) ? next.delete(key) : next.add(key); return next; });
     setDislikes((prev) => { const next = new Set(prev); next.delete(key); return next; });
@@ -157,14 +145,13 @@ export default function ProfilePage() {
     } catch {}
   };
 
-  // ── 닉네임 저장 ──────────────────────────────────────────────────────────────
   const handleSaveName = async () => {
     if (!newUsername.trim()) return;
     setSaving(true);
     try {
       const res = await api.patch('/api/auth/me', { username: newUsername.trim() });
-      // PATCH /api/auth/me: 부분 수정. username만 전달
-      setUser(res.data);        // 화면의 유저 정보 업데이트
+
+      setUser(res.data);
       setEditingName(false);
       addToast('닉네임이 변경됐어요 ✨', 'success');
     } catch {
@@ -187,15 +174,13 @@ export default function ProfilePage() {
     setShowAvatarPicker(false);
   };
 
-  // 날짜 객체 → 로컬 시간 기준 "YYYY-MM-DD" (toISOString은 UTC 기준이라 KST 자정 이후 하루 어긋남)
   const toLocalKey = (date) =>
     `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-  // ── GitHub잔디 스타일 그리드 계산 (최근 91일) ─────────────────────────────────
   const grassGrid = (() => {
     const writtenMap = {};
     diaries.forEach((d) => {
-      const key = toLocalKey(new Date(d.created_at)); // 서버 UTC → 로컬 날짜 변환
+      const key = toLocalKey(new Date(d.created_at));
       if (!writtenMap[key] || d.emotion_score > writtenMap[key]) {
         writtenMap[key] = d.emotion_score || 0;
       }
@@ -222,21 +207,20 @@ export default function ProfilePage() {
 
   const grassColor = (score, isFuture) => {
     if (isFuture) return 'transparent';
-    if (score === null) return 'var(--border)'; // 일기 없음: 회색
+    if (score === null) return 'var(--border)';
     if (score >= 5) return '#6dc09a';
     if (score >= 4) return '#8dcc9e';
     if (score >= 3) return '#e0c080';
     if (score >= 2) return '#e8a070';
     if (score >= 1) return '#e08080';
-    return '#a8d8b0'; // score=0 (일기 있지만 점수 없음): 연한 초록
+    return '#a8d8b0';
   };
 
-  if (!user) return null; // 로딩 중엔 아무것도 렌더링 안 함
+  if (!user) return null;
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
-      {/* ── 네비게이션 ── */}
       <nav className="nav-top">
         <button onClick={() => navigate('/diary')} className="btn-ghost">
           ← 일기로
@@ -252,9 +236,8 @@ export default function ProfilePage() {
 
       <div className="page-body mobile-pad" style={{ maxWidth: 600, margin: '0 auto', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-        {/* ── 유저 정보 카드 ── */}
         <div className="card">
-          {/* 아바타 + 이름 */}
+
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             <div style={{ position: 'relative' }}>
               <div
@@ -271,7 +254,7 @@ export default function ProfilePage() {
               >
                 {avatar}
               </div>
-              {/* 아바타 선택 피커 */}
+
               {showAvatarPicker && (
                 <div style={{
                   position: 'absolute', top: 64, left: 0, zIndex: 10,
@@ -304,7 +287,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* 닉네임 수정 영역 */}
           {editingName ? (
             <div style={{ display: 'flex', gap: 8 }}>
               <input
@@ -331,20 +313,17 @@ export default function ProfilePage() {
             </button>
           )}
 
-          {/* 가입일 */}
           <p style={{ marginTop: 16, color: 'var(--text-muted)', fontSize: 12 }}>
             가입일 · {new Date(user.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
-        {/* ── 나의 통계 ── */}
         <div className="card">
           <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, marginBottom: 16, color: 'var(--text)' }}>
             나의 기록
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
 
-            {/* 총 일기 수 */}
             <div style={{ background: 'var(--bg)', borderRadius: 12, padding: '16px', textAlign: 'center' }}>
               <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>총 일기</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: 'var(--primary)', fontFamily: 'Nanum Myeongjo, serif' }}>
@@ -353,7 +332,6 @@ export default function ProfilePage() {
               <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>개</p>
             </div>
 
-            {/* 연속 작성일 */}
             <div style={{ background: 'var(--bg)', borderRadius: 12, padding: '16px', textAlign: 'center' }}>
               <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>연속 작성</p>
               <p style={{ fontSize: 28, fontWeight: 700, color: streak > 0 ? '#82c9a0' : 'var(--text-muted)', fontFamily: 'Nanum Myeongjo, serif' }}>
@@ -364,7 +342,6 @@ export default function ProfilePage() {
               </p>
             </div>
 
-            {/* 평균 감정 점수 */}
             {avgScore && (
               <div style={{ background: 'var(--bg)', borderRadius: 12, padding: '16px', textAlign: 'center' }}>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>평균 감정</p>
@@ -375,7 +352,6 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* 대표 감정 */}
             {topTag && (
               <div style={{ background: 'var(--bg)', borderRadius: 12, padding: '16px', textAlign: 'center' }}>
                 <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>대표 감정</p>
@@ -389,20 +365,19 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ── 감정 잔디 그리드 ── */}
         {diaries.length > 0 && (
           <div className="card">
             <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, marginBottom: 4, color: 'var(--text)' }}>
               나의 감정 잔디
             </h3>
             <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 14 }}>최근 13주 일기 작성 기록</p>
-            {/* 요일 레이블 */}
+
             <div style={{ display: 'flex', gap: 3, marginBottom: 4, paddingLeft: 4 }}>
               {['일', '월', '화', '수', '목', '금', '토'].map((d) => (
                 <div key={d} style={{ width: 14, fontSize: 9, color: 'var(--text-muted)', textAlign: 'center', flex: '0 0 14px' }}>{d}</div>
               ))}
             </div>
-            {/* 잔디 셀 그리드 (가로: 요일, 세로: 주차) */}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {grassGrid.map((week, wi) => (
                 <div key={wi} style={{ display: 'flex', gap: 3 }}>
@@ -420,7 +395,7 @@ export default function ProfilePage() {
                 </div>
               ))}
             </div>
-            {/* 범례 */}
+
             <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>감정:</span>
               {[
@@ -437,7 +412,6 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* ── 관심사 설정 ── */}
         <div className="card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: editingPrefs ? 16 : 0 }}>
             <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, color: 'var(--text)' }}>관심사</h3>
@@ -553,7 +527,6 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* ── 로그아웃 ── */}
         <button
           onClick={logout}
           className="btn-danger-soft"

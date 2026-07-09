@@ -1,6 +1,3 @@
-// ─── 온보딩 설문 페이지 ────────────────────────────────────────────────────────────
-// 회원가입 직후 1회 표시. 좋아하는 것 / 싫어하는 것 선택 → 감정 낮을 때 맞춤 솔루션에 활용
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -37,7 +34,7 @@ export default function OnboardingPage() {
       next.has(key) ? next.delete(key) : next.add(key);
       return next;
     });
-    // 좋아하는 것에 추가하면 싫어하는 것에서 제거
+
     setDislikes((prev) => { const next = new Set(prev); next.delete(key); return next; });
   };
 
@@ -63,7 +60,7 @@ export default function OnboardingPage() {
         music_genres: Array.from(musicGenres),
       });
       await api.patch('/api/auth/me', { preferences });
-    } catch { /* 저장 실패해도 진행 */ }
+    } catch
     navigate('/diary');
   };
 
@@ -82,7 +79,6 @@ export default function OnboardingPage() {
           </p>
         </div>
 
-        {/* 좋아하는 것 */}
         <div style={{ marginBottom: 24 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>
             좋아하는 것 <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: 12 }}>(여러 개 선택 가능)</span>
@@ -109,7 +105,6 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {/* 싫어하는 것 */}
         <div style={{ marginBottom: 32 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>
             싫어하거나 하기 싫은 것 <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: 12 }}>(선택 사항)</span>
@@ -136,7 +131,6 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {/* 음악 취향 */}
         <div style={{ marginBottom: 32 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text)', marginBottom: 12 }}>
             좋아하는 음악 장르 <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: 12 }}>(선택 사항)</span>

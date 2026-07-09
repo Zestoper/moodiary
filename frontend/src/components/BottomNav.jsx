@@ -1,6 +1,3 @@
-// ─── 모바일 하단 탭 내비게이션 ────────────────────────────────────────────────────
-// 640px 이하에서만 표시됨 (CSS .bottom-nav 클래스로 제어)
-
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const NAV_ITEMS = [

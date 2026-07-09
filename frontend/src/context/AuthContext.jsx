@@ -19,13 +19,12 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
   };
 
-  // 서버에서 최신 유저 정보(크레딧 등)를 다시 불러와 상태 갱신
   const refreshUser = async () => {
     try {
       const res = await api.get('/api/auth/me');
       setUser(res.data);
     } catch {
-      // 갱신 실패해도 기존 상태 유지
+
     }
   };
 

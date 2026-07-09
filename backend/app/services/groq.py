@@ -14,20 +14,15 @@ client = Groq(api_key=settings.GROQ_API_KEY)
 MODEL_GENERAL = "llama-3.3-70b-versatile"  # 감정 분석, 솔루션, 리포트, 연애 상담에 사용
 MODEL_CHAT    = "qwen/qwen3-32b"           # 실시간 채팅 스트리밍에 사용 (한국어 맞춤법 우수)
 
-
 def _filter_cjk(text: str) -> str:
     # 한자/일본어/키릴 문자(러시아어 등)를 공백으로 대체. "그期間에" → "그 에"
     # \u0400-\u04FF: 키릴 문자 범위 (러시아어, 우크라이나어 등 슬라브 언어)
     cleaned = re.sub(r'[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u3041-\u30FF\u31F0-\u31FF\u0400-\u04FF]', ' ', text)
     return re.sub(r' {2,}', ' ', cleaned)  # .strip() 없음: 스트리밍 청크의 단어 경계 공백(' 힘' 등) 유지
 
-
 def _filter_think_tags(text: str) -> str:
     # Qwen3 thinking 모드의 <think>...</think> 블록 제거
     return re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
-
-
-
 
 # ── 감정 분석 함수 ────────────────────────────────────────────────────────────────
 def analyze_emotion(content: str) -> dict:
@@ -87,7 +82,6 @@ def analyze_emotion(content: str) -> dict:
     return result
     # 반환값 예: {"emotion_tags": "기쁨,설렘", "emotion_score": 4}
 
-
 # ── 페르소나별 시스템 프롬프트 ────────────────────────────────────────────────────
 PERSONA_PROMPTS = {
     "friend": """반말로 친근하게 대화해. 상황 파악 → 감정 공감 → 필요하면 질문 하나. 2~3문장.""",
@@ -117,7 +111,6 @@ LANGUAGE_RULE = """[언어 규칙]
 동사 활용 시 어간을 변형하지 마세요.
 올바른 예: 자다→자면 O (잘면 X), 가다→가면 O (갈면 X), 오다→오면 O (올면 X), 자다→자야 O (잘야 X).
 이러한 형태는 절대 쓰지 마세요: 잘면, 갈면, 올면, 잘야."""
-
 
 # ── AI 친구 채팅 함수 ─────────────────────────────────────────────────────────────
 def chat_with_ai(messages: list, diary_context: str = "") -> str:
@@ -161,7 +154,6 @@ def chat_with_ai(messages: list, diary_context: str = "") -> str:
 
     return _filter_cjk(response.choices[0].message.content.strip())
     # AI의 텍스트 응답만 꺼내서 반환. 한자/일본어가 섞여 있으면 제거
-
 
 # ── AI 친구 채팅 스트리밍 함수 ────────────────────────────────────────────────────
 def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = "friend"):
@@ -216,7 +208,6 @@ def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = 
                 started = True
                 yield _filter_cjk(think_buf)
 
-
 # ── 월간 감정 리포트 함수 ─────────────────────────────────────────────────────────
 def generate_monthly_report(diaries: list, year: int, month: int) -> str:
     # 한 달 치 일기를 받아서 서술형 감정 리포트 생성
@@ -248,7 +239,6 @@ def generate_monthly_report(diaries: list, year: int, month: int) -> str:
         max_tokens=400,
     )
     return response.choices[0].message.content.strip()
-
 
 # ── 맞춤 솔루션 생성 함수 ─────────────────────────────────────────────────────────
 def generate_solution(diary_content: str, emotion_score: int, emotion_tags: str, preferences: dict) -> str:
@@ -283,7 +273,6 @@ def generate_solution(diary_content: str, emotion_score: int, emotion_tags: str,
         max_tokens=400,
     )
     return response.choices[0].message.content.strip()
-
 
 # ── 연애 상담 함수 ────────────────────────────────────────────────────────────────
 def analyze_relationship(situation: str, my_action: str, partner_action: str) -> dict:
