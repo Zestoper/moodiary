@@ -30,24 +30,6 @@ const AI_PERSONAS = [
   { key: 'realist',    emoji: '🔥', name: '현실러', desc: '팩트로 직격' },
 ];
 
-const PROMPTS = [
-  '오늘 가장 기억에 남는 대화는?', '지금 가장 고마운 사람은 누구인가요?',
-  '오늘 가장 힘들었던 순간, 어떻게 넘겼나요?', '나 자신에게 칭찬해주고 싶은 것은?',
-  '요즘 머릿속을 가장 많이 차지하는 생각은?', '오늘 처음 해본 것이 있나요?',
-  '지금 당장 가고 싶은 장소는? 왜?', '오늘 느낀 감정 중 가장 강렬했던 것은?',
-  '한 달 뒤의 나에게 하고 싶은 말은?', '오늘 하루를 색깔로 표현한다면?',
-  '최근에 새로 배운 것이 있나요?', '지금 나를 행복하게 만드는 작은 것들은?',
-  '오늘 스스로에게 가장 솔직했던 순간은?', '요즘 가장 걱정되는 것은?',
-  '오늘 내가 내린 가장 중요한 선택은?', '지금 가장 듣고 싶은 말은?',
-  '오늘 나의 에너지를 가장 많이 쏟은 곳은?', '올해 꼭 이루고 싶은 한 가지는?',
-  '오늘 나를 웃게 만든 것은?', '지금 나에게 가장 필요한 것은?',
-  '오늘 처음으로 깨달은 것이 있다면?', '요즘 가장 보고 싶은 사람은?',
-  '나만의 스트레스 해소법은?', '오늘 다시 돌아간다면 바꾸고 싶은 순간이 있나요?',
-  '지금 마음 상태를 날씨로 표현한다면?', '요즘 나에게 가장 큰 위로가 되는 것은?',
-  '오늘 내가 보여준 모습이 마음에 드나요?', '지금 가장 설레는 것은?',
-  '오늘 하루를 한 줄로 요약한다면?', '지금 이 순간 어떤 기분인가요?',
-];
-
 const NAV_STYLE = {
   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
   padding: '12px 16px', background: 'var(--surface)',
@@ -84,7 +66,6 @@ export default function DiaryPage() {
 
   const [weatherInfo, setWeatherInfo] = useState(null);
 
-  const [promptIdx, setPromptIdx] = useState(() => Math.floor(Math.random() * PROMPTS.length));
 
   const [persona, setPersona] = useState(() => localStorage.getItem('ai_persona') || 'friend');
 
@@ -188,9 +169,11 @@ export default function DiaryPage() {
           const code = json.current.weather_code;
           const temp = Math.round(json.current.temperature_2m);
           setWeatherInfo({ code, temperature: temp, ...(WMO[code] || { emoji: '🌡️', text: '날씨' }) });
-        } catch
+        } catch {
+          // 날씨 조회 실패는 무시 (선택 기능)
+        }
       },
-      () => ,
+      () => {},
       { timeout: 5000 },
     );
   };
@@ -537,7 +520,7 @@ export default function DiaryPage() {
                       })().map(({ label, query }) => (
                         <a
                           key={label}
-                          href={`https:
+                          href={`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
@@ -678,17 +661,6 @@ export default function DiaryPage() {
                   )}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, padding: '10px 14px', background: 'var(--bg)', borderRadius: 10, border: '1px solid var(--border)' }}>
-                  <span style={{ fontSize: 13, color: 'var(--text-muted)', flex: 1 }}>✍️ {PROMPTS[promptIdx]}</span>
-                  <button
-                    type="button"
-                    onClick={() => setPromptIdx(Math.floor(Math.random() * PROMPTS.length))}
-                    style={{ fontSize: 16, background: 'transparent', color: 'var(--text-muted)', padding: '2px 6px', border: 'none', cursor: 'pointer', flexShrink: 0 }}
-                    title="다른 질문"
-                  >
-                    🎲
-                  </button>
-                </div>
                 <input placeholder="제목" value={title} onChange={(e) => setTitle(e.target.value)} style={{ marginBottom: 12 }} />
 
                 <div style={{ position: 'relative', marginBottom: 16 }}>

@@ -12,7 +12,7 @@ client = Groq(api_key=settings.GROQ_API_KEY)
 
 # 모델명 상수. 변경 시 이 두 줄만 수정하면 됨
 MODEL_GENERAL = "llama-3.3-70b-versatile"  # 감정 분석, 솔루션, 리포트, 연애 상담에 사용
-MODEL_CHAT    = "qwen/qwen3-32b"           # 실시간 채팅 스트리밍에 사용 (한국어 맞춤법 우수)
+MODEL_CHAT    = "qwen/qwen3.6-27b"         # 실시간 채팅 스트리밍에 사용 (한국어 맞춤법 우수)
 
 def _filter_cjk(text: str) -> str:
     # 한자/일본어/키릴 문자(러시아어 등)를 공백으로 대체. "그期間에" → "그 에"
@@ -166,47 +166,33 @@ def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = 
 
     stream = client.chat.completions.create(
         model=MODEL_CHAT,
-        # qwen3-32b: 한국어 맞춤법·띄어쓰기가 llama보다 훨씬 정확함
+        # qwen3 계열: 한국어 맞춤법·띄어쓰기가 llama보다 훨씬 정확함
         messages=[
-            {"role": "system", "content": "/no_think\n" + system_prompt},
-            # /no_think: Qwen3의 thinking 모드(내부 추론) 비활성화. 빠른 응답을 위해
+            {"role": "system", "content": system_prompt},
             *messages
         ],
         temperature=0.7,
         max_tokens=300,
         stream=True,
+        reasoning_effort="none",
+        # reasoning_effort="none": Qwen3의 thinking 모드(내부 추론) 비활성화. 빠른 응답을 위해
     )
 
-    # <think>...</think> 블록은 응답 앞부분에 나옴. 버퍼에 모아서 통과시킨 뒤 yield
-    think_buf = ''
-    think_done = False
-    started = False  # think 블록 이후 첫 실제 텍스트가 나왔는지 여부
+    # reasoning_effort="none"이 thinking 블록 생성 자체를 막아주므로 청크를 그대로 필터링해 yield
+    started = False  # 첫 실제 텍스트가 나왔는지 여부 (선행 공백 제거용)
 
     for chunk in stream:
         content = chunk.choices[0].delta.content
         if not content:
             continue
 
-        if think_done:
-            filtered = _filter_cjk(content).replace('\n', ' ')
-            # 응답 내 줄바꿈을 공백으로 변환 (말풍선 안에서 문장 사이 빈 줄 방지)
-            if not started:
-                filtered = filtered.lstrip()
-            if filtered:
-                started = True
-                yield filtered
-        else:
-            think_buf += content
-            if '</think>' in think_buf:
-                after = think_buf[think_buf.find('</think>') + len('</think>'):].lstrip()
-                think_done = True
-                if after:
-                    started = True
-                    yield _filter_cjk(after)
-            elif len(think_buf) > 300 and '<think>' not in think_buf:
-                think_done = True
-                started = True
-                yield _filter_cjk(think_buf)
+        filtered = _filter_cjk(content).replace('\n', ' ')
+        # 응답 내 줄바꿈을 공백으로 변환 (말풍선 안에서 문장 사이 빈 줄 방지)
+        if not started:
+            filtered = filtered.lstrip()
+        if filtered:
+            started = True
+            yield filtered
 
 # ── 월간 감정 리포트 함수 ─────────────────────────────────────────────────────────
 def generate_monthly_report(diaries: list, year: int, month: int) -> str:

@@ -60,7 +60,9 @@ export default function OnboardingPage() {
         music_genres: Array.from(musicGenres),
       });
       await api.patch('/api/auth/me', { preferences });
-    } catch
+    } catch {
+      // 저장 실패해도 온보딩은 계속 진행
+    }
     navigate('/diary');
   };
 

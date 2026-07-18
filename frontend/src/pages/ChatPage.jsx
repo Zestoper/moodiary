@@ -118,7 +118,9 @@ export default function ChatPage() {
             } else if (data.type === 'error') {
               addToast('AI 응답에 실패했어', 'error');
             }
-          } catch
+          } catch {
+            // 아직 완전히 수신되지 않은 청크는 무시
+          }
         }
       }
     } catch {
