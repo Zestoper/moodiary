@@ -307,3 +307,9 @@ button:disabled {
   --error-bg: #3d1a1a;
   --success: #6dc09a;
 }
+
+/* lucide 아이콘이 글자와 같은 높이에 오도록 정렬 */
+.lucide {
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}

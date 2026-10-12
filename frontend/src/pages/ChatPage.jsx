@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getChatHistory, clearChatHistory } from '../api/chat';
 import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../context/ToastContext';
+import { ArrowLeft, Moon, Sprout, Sun } from 'lucide-react';
+import { PERSONA_ICONS } from '../icons';
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -18,8 +20,7 @@ export default function ChatPage() {
   const bottomRef = useRef(null);
 
   const persona = localStorage.getItem('ai_persona') || 'friend';
-  const PERSONA_LABELS  = { friend: '🌿 친구', mentor: '📚 선배', counselor: '🧠 상담사', cheerleader: '🎉 응원단', simsimi: '🤪 심심이', realist: '🔥 현실러' };
-  const PERSONA_AVATARS = { friend: '🌿', mentor: '📚', counselor: '🧠', cheerleader: '🎉', simsimi: '🤪', realist: '🔥' };
+  const PERSONA_LABELS  = { friend: '친구', mentor: '선배', counselor: '상담사', cheerleader: '응원단', simsimi: '심심이', realist: '현실러' };
 
   const now = new Date();
   const days = ['일', '월', '화', '수', '목', '금', '토'];
@@ -144,7 +145,7 @@ export default function ChatPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
 
       <nav className="nav-top">
-        <button onClick={() => navigate('/diary')} className="btn-ghost">← 일기로</button>
+        <button onClick={() => navigate('/diary')} className="btn-ghost"><ArrowLeft size="1em" /> 일기로</button>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>AI 친구</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>{today} · {PERSONA_LABELS[persona]}</p>
@@ -162,7 +163,7 @@ export default function ChatPage() {
             </>
           )}
           <button onClick={toggleTheme} className="btn-icon">
-            {isDark ? '☀️' : '🌙'}
+            {isDark ? <Sun size="1em" /> : <Moon size="1em" />}
           </button>
         </div>
       </nav>
@@ -170,7 +171,7 @@ export default function ChatPage() {
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 16px', maxWidth: 640, width: '100%', margin: '0 auto' }}>
         {messages.length === 0 && (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', paddingTop: 60 }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🌱</div>
+            <div style={{ fontSize: 48, marginBottom: 12 }}><Sprout size="1em" strokeWidth={1.75} style={{ color: 'var(--primary)' }} /></div>
             <p>AI 친구에게 오늘 하루를 이야기해봐요</p>
           </div>
         )}
@@ -179,7 +180,7 @@ export default function ChatPage() {
           <div key={msg.id} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 16 }}>
             {msg.role === 'assistant' && (
               <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 8, flexShrink: 0, fontSize: 18 }}>
-                {PERSONA_AVATARS[persona]}
+                {(() => { const P = PERSONA_ICONS[persona] || PERSONA_ICONS.friend; return <P size="1em" strokeWidth={1.75} />; })()}
               </div>
             )}
             <div style={{

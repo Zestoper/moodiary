@@ -1,24 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
+import { Sprout } from 'lucide-react';
+import { HOBBY_ICONS } from '../icons';
 
 const MUSIC_GENRES = [
   '팝', 'K-POP', '발라드', '힙합', 'R&B', '인디', '재즈', '클래식', '록', 'EDM', '트로트', 'OST',
 ];
 
 const CATEGORIES = [
-  { key: '음악 듣기',      icon: '🎵' },
-  { key: '영화/드라마',    icon: '🎬' },
-  { key: '운동/스트레칭',  icon: '💪' },
-  { key: '산책/야외활동',  icon: '🌿' },
-  { key: '게임',           icon: '🎮' },
-  { key: '요리/베이킹',   icon: '🍳' },
-  { key: '독서',           icon: '📚' },
-  { key: '그림/그리기',   icon: '🎨' },
-  { key: '친구/가족과 대화', icon: '💬' },
-  { key: '혼자만의 시간', icon: '🧘' },
-  { key: '카페/맛집 탐방', icon: '☕' },
-  { key: '드라이브',       icon: '🚗' },
+  { key: '음악 듣기' },
+  { key: '영화/드라마' },
+  { key: '운동/스트레칭' },
+  { key: '산책/야외활동' },
+  { key: '게임' },
+  { key: '요리/베이킹' },
+  { key: '독서' },
+  { key: '그림/그리기' },
+  { key: '친구/가족과 대화' },
+  { key: '혼자만의 시간' },
+  { key: '카페/맛집 탐방' },
+  { key: '드라이브' },
 ];
 
 export default function OnboardingPage() {
@@ -71,7 +73,7 @@ export default function OnboardingPage() {
       <div className="auth-card" style={{ width: '100%', maxWidth: 520, background: 'var(--surface)', borderRadius: 'var(--radius)', padding: '40px 36px', boxShadow: 'var(--shadow)' }}>
 
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 36, marginBottom: 10 }}>🌱</div>
+          <div style={{ fontSize: 36, marginBottom: 10 }}><Sprout size="1em" strokeWidth={1.75} style={{ color: 'var(--primary)' }} /></div>
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 22, color: 'var(--primary)', marginBottom: 8 }}>
             나에 대해 알려주세요
           </h2>
@@ -86,7 +88,7 @@ export default function OnboardingPage() {
             좋아하는 것 <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: 12 }}>(여러 개 선택 가능)</span>
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {CATEGORIES.map(({ key, icon }) => {
+            {CATEGORIES.map(({ key }) => {
               const selected = likes.has(key);
               return (
                 <button
@@ -100,7 +102,7 @@ export default function OnboardingPage() {
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
-                  {icon} {key}
+                  {(() => { const H = HOBBY_ICONS[key]; return H ? <H size="1em" /> : null; })()} {key}
                 </button>
               );
             })}
@@ -112,7 +114,7 @@ export default function OnboardingPage() {
             싫어하거나 하기 싫은 것 <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: 12 }}>(선택 사항)</span>
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {CATEGORIES.map(({ key, icon }) => {
+            {CATEGORIES.map(({ key }) => {
               const selected = dislikes.has(key);
               return (
                 <button
@@ -126,7 +128,7 @@ export default function OnboardingPage() {
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
-                  {icon} {key}
+                  {(() => { const H = HOBBY_ICONS[key]; return H ? <H size="1em" /> : null; })()} {key}
                 </button>
               );
             })}

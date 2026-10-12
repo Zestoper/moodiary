@@ -8,26 +8,28 @@ import { getMusicRecommendation } from '../api/music';
 import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../context/ToastContext';
 import BottomNav from '../components/BottomNav';
+import { ArrowLeft, FileText, Leaf, MessageSquare, Mic, Moon, Music, NotebookPen, Pencil, Search, Sun } from 'lucide-react';
+import { PERSONA_ICONS, weatherIcon } from '../icons';
 
 const WMO = {
-  0: { emoji: '☀️', text: '맑음' }, 1: { emoji: '🌤️', text: '대체로 맑음' },
-  2: { emoji: '⛅', text: '구름 조금' }, 3: { emoji: '☁️', text: '흐림' },
-  45: { emoji: '🌫️', text: '안개' }, 48: { emoji: '🌫️', text: '안개' },
-  51: { emoji: '🌦️', text: '이슬비' }, 53: { emoji: '🌦️', text: '이슬비' }, 55: { emoji: '🌧️', text: '이슬비' },
-  61: { emoji: '🌧️', text: '비' }, 63: { emoji: '🌧️', text: '비' }, 65: { emoji: '🌧️', text: '폭우' },
-  71: { emoji: '❄️', text: '눈' }, 73: { emoji: '❄️', text: '눈' }, 75: { emoji: '❄️', text: '폭설' },
-  77: { emoji: '🌨️', text: '싸락눈' },
-  80: { emoji: '🌦️', text: '소나기' }, 81: { emoji: '🌦️', text: '소나기' }, 82: { emoji: '🌧️', text: '강한 소나기' },
-  95: { emoji: '⛈️', text: '뇌우' }, 96: { emoji: '⛈️', text: '뇌우' }, 99: { emoji: '⛈️', text: '뇌우' },
+  0: { text: '맑음' }, 1: { text: '대체로 맑음' },
+  2: { text: '구름 조금' }, 3: { text: '흐림' },
+  45: { text: '안개' }, 48: { text: '안개' },
+  51: { text: '이슬비' }, 53: { text: '이슬비' }, 55: { text: '이슬비' },
+  61: { text: '비' }, 63: { text: '비' }, 65: { text: '폭우' },
+  71: { text: '눈' }, 73: { text: '눈' }, 75: { text: '폭설' },
+  77: { text: '싸락눈' },
+  80: { text: '소나기' }, 81: { text: '소나기' }, 82: { text: '강한 소나기' },
+  95: { text: '뇌우' }, 96: { text: '뇌우' }, 99: { text: '뇌우' },
 };
 
 const AI_PERSONAS = [
-  { key: 'friend',      emoji: '🌿', name: '친구',   desc: '공감하며 반말로' },
-  { key: 'mentor',      emoji: '📚', name: '선배',   desc: '따뜻한 조언' },
-  { key: 'counselor',   emoji: '🧠', name: '상담사', desc: '전문적·존댓말' },
-  { key: 'cheerleader', emoji: '🎉', name: '응원단', desc: '무조건 긍정!' },
-  { key: 'simsimi',     emoji: '🤪', name: '심심이', desc: '엉뚱하고 위트 있게' },
-  { key: 'realist',    emoji: '🔥', name: '현실러', desc: '팩트로 직격' },
+  { key: 'friend',      name: '친구',   desc: '공감하며 반말로' },
+  { key: 'mentor',      name: '선배',   desc: '따뜻한 조언' },
+  { key: 'counselor',   name: '상담사', desc: '전문적·존댓말' },
+  { key: 'cheerleader', name: '응원단', desc: '무조건 긍정!' },
+  { key: 'simsimi',     name: '심심이', desc: '엉뚱하고 위트 있게' },
+  { key: 'realist',    name: '현실러', desc: '팩트로 직격' },
 ];
 
 const NAV_STYLE = {
@@ -168,7 +170,7 @@ export default function DiaryPage() {
           const json = await res.json();
           const code = json.current.weather_code;
           const temp = Math.round(json.current.temperature_2m);
-          setWeatherInfo({ code, temperature: temp, ...(WMO[code] || { emoji: '🌡️', text: '날씨' }) });
+          setWeatherInfo({ code, temperature: temp, ...(WMO[code] || { text: '날씨' }) });
         } catch {
           // 날씨 조회 실패는 무시 (선택 기능)
         }
@@ -199,7 +201,7 @@ export default function DiaryPage() {
       setDiaries([newDiary, ...diaries]);
       setTitle(''); setContent(''); setShowForm(false); setWeatherInfo(null); setSearch('');
       localStorage.removeItem('diary_draft');
-      addToast('일기가 저장됐어요 🌿', 'success');
+      addToast('일기가 저장됐어요', 'success');
     } catch {
       addToast('저장에 실패했어요', 'error');
     } finally { setLoading(false); }
@@ -233,7 +235,7 @@ export default function DiaryPage() {
       setDiaries(diaries.map((d) => d.id === updated.id ? updated : d));
       setSelected(updated);
       setIsEditing(false);
-      addToast('일기가 수정됐어요 ✏️', 'success');
+      addToast('일기가 수정됐어요', 'success');
     } catch {
       addToast('수정에 실패했어요', 'error');
     } finally { setLoading(false); }
@@ -306,7 +308,7 @@ export default function DiaryPage() {
       year: 'numeric', month: 'long', day: 'numeric',
     });
     const tagsLine = diary.emotion_tags
-      ? `<p class="tags">🎭 ${escapeHtml(diary.emotion_tags)}${diary.emotion_score ? ` · ${diary.emotion_score}점` : ''}</p>`
+      ? `<p class="tags">${escapeHtml(diary.emotion_tags)}${diary.emotion_score ? ` · ${diary.emotion_score}점` : ''}</p>`
       : '';
     const html = `<!DOCTYPE html>
 <html><head>
@@ -357,7 +359,7 @@ export default function DiaryPage() {
             onClick={() => { setSelected(null); setShowForm(false); stopListening(); setWeatherInfo(null); }}
             style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 22, color: 'var(--primary)', cursor: 'pointer' }}
           >
-            🌿 Moodiary
+           <Leaf size="1em" /> Moodiary
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 2 }}>
             {username ? `안녕, ${username}님` : '안녕하세요'} · {today}
@@ -379,7 +381,7 @@ export default function DiaryPage() {
           </div>
           {/* 모바일에서도 표시 */}
           <button onClick={toggleTheme} style={{ padding: '7px 10px', background: 'transparent', color: 'var(--text-muted)', fontSize: 16, border: '1px solid var(--border)', borderRadius: 10 }}>
-            {isDark ? '☀️' : '🌙'}
+            {isDark ? <Sun size="1em" /> : <Moon size="1em" />}
           </button>
           <button onClick={logout} style={{ padding: '7px 14px', background: 'transparent', color: 'var(--text-muted)', fontSize: 13 }}>로그아웃</button>
         </div>
@@ -390,7 +392,7 @@ export default function DiaryPage() {
           /* ── 일기 상세 보기 / 수정 ── */
           <div>
             <button onClick={() => { setSelected(null); setIsEditing(false); }} style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 14, padding: '4px 0', marginBottom: 20 }}>
-              ← 목록으로
+             <ArrowLeft size="1em" /> 목록으로
             </button>
 
             {isEditing ? (
@@ -423,7 +425,7 @@ export default function DiaryPage() {
                       animation: isListening ? 'blink 1s step-end infinite' : 'none',
                     }}
                   >
-                    🎤
+                   <Mic size="1em" />
                   </button>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -478,11 +480,11 @@ export default function DiaryPage() {
 
                 {/* ── 음악 추천 ── */}
                 {musicLoading && (
-                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '16px 0 0' }}>🎵 감정에 맞는 플레이리스트 찾는 중...</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '16px 0 0' }}><Music size="1em" /> 감정에 맞는 플레이리스트 찾는 중...</p>
                 )}
                 {music?.playlists?.length > 0 && (
                   <div style={{ marginTop: 16 }}>
-                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>🎵 이 감정에 어울리는 플레이리스트</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}><Music size="1em" /> 이 감정에 어울리는 플레이리스트</p>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       {music.playlists.map((p) => (
                         <a
@@ -539,8 +541,8 @@ export default function DiaryPage() {
 
                 <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
                   <button onClick={() => navigate(`/chat?diary_id=${selected.id}`)} style={{ flex: '1 1 auto', padding: '12px 0', background: 'var(--primary)', color: 'white', fontWeight: 600, minWidth: 120 }}>이 일기로 AI 채팅</button>
-                  <button onClick={() => handleExportPDF(selected)} style={{ padding: '12px 16px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontWeight: 600 }} title="PDF로 저장">📄</button>
-                  <button onClick={handleEditStart} style={{ padding: '12px 20px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontWeight: 600 }}>✏️ 수정</button>
+                  <button onClick={() => handleExportPDF(selected)} style={{ padding: '12px 16px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontWeight: 600 }} title="PDF로 저장"><FileText size="1em" /></button>
+                  <button onClick={handleEditStart} style={{ padding: '12px 20px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontWeight: 600 }}><Pencil size="1em" /> 수정</button>
                   {confirmDeleteId === selected.id ? (
                     <>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)', alignSelf: 'center' }}>
@@ -565,7 +567,7 @@ export default function DiaryPage() {
           <div>
 
             <div className="card" style={{ cursor: 'default', marginBottom: 24 }}>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>💬 AI 채팅 말투 선택</p>
+              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}><MessageSquare size="1em" /> AI 채팅 말투 선택</p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {AI_PERSONAS.map((p) => (
                   <button
@@ -586,7 +588,7 @@ export default function DiaryPage() {
                       transition: 'all 0.15s',
                     }}
                   >
-                    <div style={{ fontSize: 20, marginBottom: 2 }}>{p.emoji}</div>
+                    <div style={{ fontSize: 20, marginBottom: 2, display: 'flex', justifyContent: 'center' }}>{(() => { const P = PERSONA_ICONS[p.key]; return <P size="1em" strokeWidth={1.75} />; })()}</div>
                     <div style={{ fontSize: 13, fontWeight: persona === p.key ? 600 : 400 }}>{p.name}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{p.desc}</div>
                   </button>
@@ -624,7 +626,7 @@ export default function DiaryPage() {
 
             {diaries.length > 0 && (
               <div style={{ position: 'relative', marginBottom: 20 }}>
-                <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 15, pointerEvents: 'none' }}>🔍</span>
+                <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 15, pointerEvents: 'none' }}><Search size="1em" /></span>
 
                 <input
                   type="text"
@@ -656,7 +658,7 @@ export default function DiaryPage() {
                   <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', flex: 1, minWidth: 0 }}>오늘 하루를 기록해요</h3>
                   {weatherInfo && (
                     <span style={{ fontSize: 13, color: 'var(--text-muted)', background: 'var(--bg)', padding: '4px 10px', borderRadius: 20, border: '1px solid var(--border)', flexShrink: 0, whiteSpace: 'nowrap' }}>
-                      {weatherInfo.emoji} {weatherInfo.text} {weatherInfo.temperature}°C
+                      {(() => { const W = weatherIcon(weatherInfo.code); return <W size="1em" />; })()} {weatherInfo.text} {weatherInfo.temperature}°C
                     </span>
                   )}
                 </div>
@@ -685,7 +687,7 @@ export default function DiaryPage() {
 
                     }}
                   >
-                    🎤
+                   <Mic size="1em" />
                   </button>
                 </div>
                 <button type="submit" disabled={loading} style={{ width: '100%', padding: '13px 0', background: 'var(--primary)', color: 'white', fontWeight: 600 }}>
@@ -696,7 +698,7 @@ export default function DiaryPage() {
 
             {filteredDiaries.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>{search ? '🔍' : '📔'}</div>
+                <div style={{ fontSize: 48, marginBottom: 16, display: 'flex', justifyContent: 'center', color: 'var(--text-muted)' }}>{search ? <Search size="1em" strokeWidth={1.5} /> : <NotebookPen size="1em" strokeWidth={1.5} />}</div>
                 <p>{search ? `"${search}" 검색 결과가 없어요` : '아직 일기가 없어요. 첫 일기를 써보세요!'}</p>
 
               </div>
