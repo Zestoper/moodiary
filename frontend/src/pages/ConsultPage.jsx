@@ -5,6 +5,7 @@ import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../context/ToastContext';
 import { PERSONA_CONFIRM } from '../constants/persona';
 import BottomNav from '../components/BottomNav';
+import { ArrowLeft, Mail, HeartHandshake, Moon, Sun, Target } from 'lucide-react';
 
 export default function ConsultPage() {
   const navigate = useNavigate();
@@ -98,12 +99,12 @@ export default function ConsultPage() {
           onClick={() => navigate('/diary')}
           className="btn-ghost"
         >
-          ← 일기로
+         <ArrowLeft size="1em" /> 일기로
         </button>
         <div style={{ flex: 1 }}>
 
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>
-            💌 연애 상담
+           <HeartHandshake size="1em" /> 연애 상담
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>{today}</p>
 
@@ -114,7 +115,7 @@ export default function ConsultPage() {
           className="btn-icon"
           title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
         >
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? <Sun size="1em" /> : <Moon size="1em" />}
         </button>
       </nav>
 
@@ -128,7 +129,7 @@ export default function ConsultPage() {
               onClick={() => setSelected(null)}
               style={{ background: 'transparent', color: 'var(--text-muted)', fontSize: 14, padding: '4px 0', marginBottom: 20 }}
             >
-              ← 목록으로
+             <ArrowLeft size="1em" /> 목록으로
             </button>
 
             <div className="card" style={{ cursor: 'default' }}>
@@ -163,7 +164,7 @@ export default function ConsultPage() {
 
               {selected.verdict && (
                 <div style={{ marginBottom: 20 }}>
-                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, fontWeight: 500 }}>🎯 AI 판정</p>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10, fontWeight: 500 }}><Target size="1em" /> AI 판정</p>
                   <span style={{
                     display: 'inline-block',
                     background: 'var(--primary-light)',
@@ -183,7 +184,7 @@ export default function ConsultPage() {
               {selected.message_script && (
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>✉️ 화해 문자 스크립트</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}><Mail size="1em" /> 화해 문자 스크립트</p>
 
                     <button
                       onClick={() => handleCopy(selected.message_script)}
@@ -198,7 +199,7 @@ export default function ConsultPage() {
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      {copied ? '✓ 복사됨!' : '복사'}
+                      {copied ? '복사됨!' : '복사'}
 
                     </button>
                   </div>
@@ -279,14 +280,14 @@ export default function ConsultPage() {
                 disabled={loading}
                 className="btn-primary"
               >
-                {loading ? '💭 AI가 판단 중...' : '💌 판정받기'}
+                {loading ? 'AI가 판단 중...' : '판정받기'}
               </button>
             </form>
 
             {result && (
               <div className="card" style={{ marginBottom: 28, border: '1.5px solid var(--primary-light)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                  <span style={{ fontSize: 22 }}>🎯</span>
+                  <span style={{ fontSize: 22 }}><Target size="1em" /></span>
                   <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>AI 판정 결과</h3>
                 </div>
 
@@ -308,7 +309,7 @@ export default function ConsultPage() {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                     <p style={{ fontSize: 13, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                      ✉️ 화해 문자 스크립트
+                     <Mail size="1em" /> 화해 문자 스크립트
                     </p>
                     <button
                       onClick={() => handleCopy(result.message_script)}
@@ -322,7 +323,7 @@ export default function ConsultPage() {
                         transition: 'all 0.2s ease',
                       }}
                     >
-                      {copied ? '✓ 복사됨!' : '복사'}
+                      {copied ? '복사됨!' : '복사'}
                     </button>
                   </div>
                   <div className="content-block">
@@ -340,7 +341,7 @@ export default function ConsultPage() {
               {consultations.length === 0 ? (
 
                 <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--text-muted)' }}>
-                  <div style={{ fontSize: 40, marginBottom: 12 }}>💌</div>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}><HeartHandshake size="1em" /></div>
                   <p>아직 상담 기록이 없어요</p>
                 </div>
               ) : (

@@ -5,17 +5,8 @@ import { getMonthlyReport } from '../api/report';
 import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../context/ToastContext';
 import BottomNav from '../components/BottomNav';
-
-const WMO = {
-  0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
-  45: '🌫️', 48: '🌫️',
-  51: '🌦️', 53: '🌦️', 55: '🌧️',
-  61: '🌧️', 63: '🌧️', 65: '🌧️',
-  71: '❄️', 73: '❄️', 75: '❄️', 77: '🌨️',
-  80: '🌦️', 81: '🌦️', 82: '🌧️',
-  85: '🌨️', 86: '🌨️',
-  95: '⛈️', 96: '⛈️', 99: '⛈️',
-};
+import { ArrowLeft, ArrowRight, Moon, Sun } from 'lucide-react';
+import { weatherIcon } from '../icons';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -97,13 +88,15 @@ export default function CalendarPage() {
   const weatherGroups = {};
   monthDiaries.forEach((d) => {
     if (d.weather_code == null || !d.emotion_score) return;
-    const emoji = WMO[d.weather_code] || '🌡️';
-    if (!weatherGroups[emoji]) weatherGroups[emoji] = [];
-    weatherGroups[emoji].push(d.emotion_score);
+    const Icon = weatherIcon(d.weather_code);
+    const key = Icon.displayName || String(d.weather_code);
+    if (!weatherGroups[key]) weatherGroups[key] = { Icon, scores: [] };
+    weatherGroups[key].scores.push(d.emotion_score);
   });
   const weatherStats = Object.entries(weatherGroups)
-    .map(([emoji, scores]) => ({
-      emoji,
+    .map(([key, { Icon, scores }]) => ({
+      key,
+      Icon,
       avg: (scores.reduce((s, v) => s + v, 0) / scores.length).toFixed(1),
       count: scores.length,
     }))
@@ -167,7 +160,7 @@ export default function CalendarPage() {
           onClick={() => navigate('/diary')}
           className="btn-ghost"
         >
-          ← 일기로
+         <ArrowLeft size="1em" /> 일기로
         </button>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>
@@ -180,7 +173,7 @@ export default function CalendarPage() {
           className="btn-icon"
           title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
         >
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? <Sun size="1em" /> : <Moon size="1em" />}
         </button>
       </nav>
 
@@ -191,7 +184,7 @@ export default function CalendarPage() {
             onClick={prevMonth}
             style={{ background: 'var(--surface)', color: 'var(--text)', padding: '8px 18px', border: '1px solid var(--border)', borderRadius: 12, fontSize: 16 }}
           >
-            ←
+           <ArrowLeft size="1em" />
           </button>
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 22, color: 'var(--text)' }}>
             {year}년 {month + 1}월
@@ -200,7 +193,7 @@ export default function CalendarPage() {
             onClick={nextMonth}
             style={{ background: 'var(--surface)', color: 'var(--text)', padding: '8px 18px', border: '1px solid var(--border)', borderRadius: 12, fontSize: 16 }}
           >
-            →
+            <ArrowRight size="1em" />
           </button>
         </div>
 
@@ -317,7 +310,7 @@ export default function CalendarPage() {
 
                   {diary?.weather_code != null && (
                     <span style={{ fontSize: 9, lineHeight: 1, marginTop: 1 }}>
-                      {WMO[diary.weather_code] || '🌡️'}
+                      {(() => { const W = weatherIcon(diary.weather_code); return <W size="1em" />; })()}
                     </span>
                   )}
                   {diary && !diary.emotion_score && diary.weather_code == null && (
@@ -409,9 +402,9 @@ export default function CalendarPage() {
               날씨별 평균 감정
             </p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              {weatherStats.map(({ emoji, avg, count }) => (
-                <div key={emoji} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'var(--bg)', borderRadius: 20, fontSize: 13 }}>
-                  <span style={{ fontSize: 18 }}>{emoji}</span>
+              {weatherStats.map(({ key, Icon, avg, count }) => (
+                <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'var(--bg)', borderRadius: 20, fontSize: 13 }}>
+                  <span style={{ fontSize: 18, display: 'inline-flex' }}><Icon size="1em" /></span>
                   <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{avg}점</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>({count}일)</span>
                 </div>

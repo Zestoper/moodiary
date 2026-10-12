@@ -7,26 +7,28 @@ import { getMe } from '../api/auth';
 import { getDiaries } from '../api/diary';
 import api from '../api/axios';
 import BottomNav from '../components/BottomNav';
+import { ArrowLeft, Moon, Pencil, Sun } from 'lucide-react';
+import { HOBBY_ICONS, avatarIcon, AVATAR_ICONS } from '../icons';
 
-const AVATARS = ['🌿', '🌸', '🦊', '🐻', '🌙', '☀️', '🦋', '🌊', '🍀', '🎵', '🔥', '⭐'];
+const AVATARS = Object.keys(AVATAR_ICONS).slice(0, 12);
 
 const MUSIC_GENRES = [
   '팝', 'K-POP', '발라드', '힙합', 'R&B', '인디', '재즈', '클래식', '록', 'EDM', '트로트', 'OST',
 ];
 
 const CATEGORIES = [
-  { key: '음악 듣기',        icon: '🎵' },
-  { key: '영화/드라마',      icon: '🎬' },
-  { key: '운동/스트레칭',    icon: '💪' },
-  { key: '산책/야외활동',    icon: '🌿' },
-  { key: '게임',             icon: '🎮' },
-  { key: '요리/베이킹',      icon: '🍳' },
-  { key: '독서',             icon: '📚' },
-  { key: '그림/그리기',      icon: '🎨' },
-  { key: '친구/가족과 대화', icon: '💬' },
-  { key: '혼자만의 시간',    icon: '🧘' },
-  { key: '카페/맛집 탐방',   icon: '☕' },
-  { key: '드라이브',         icon: '🚗' },
+  { key: '음악 듣기' },
+  { key: '영화/드라마' },
+  { key: '운동/스트레칭' },
+  { key: '산책/야외활동' },
+  { key: '게임' },
+  { key: '요리/베이킹' },
+  { key: '독서' },
+  { key: '그림/그리기' },
+  { key: '친구/가족과 대화' },
+  { key: '혼자만의 시간' },
+  { key: '카페/맛집 탐방' },
+  { key: '드라이브' },
 ];
 
 export default function ProfilePage() {
@@ -40,7 +42,11 @@ export default function ProfilePage() {
   const [editingName, setEditingName] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [saving, setSaving] = useState(false);
-  const [avatar, setAvatar] = useState(() => localStorage.getItem('profile_avatar') || '🌿');
+  const [avatar, setAvatar] = useState(() => {
+    // 예전 버전에서 저장된 이모지 값은 기본 아이콘으로 대체
+    const saved = localStorage.getItem('profile_avatar');
+    return saved && AVATAR_ICONS[saved] ? saved : 'leaf';
+  });
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const [likes, setLikes] = useState(new Set());
@@ -153,7 +159,7 @@ export default function ProfilePage() {
 
       setUser(res.data);
       setEditingName(false);
-      addToast('닉네임이 변경됐어요 ✨', 'success');
+      addToast('닉네임이 변경됐어요', 'success');
     } catch {
       addToast('변경에 실패했어요', 'error');
     } finally {
@@ -168,9 +174,9 @@ export default function ProfilePage() {
     return '#e0c080';
   };
 
-  const handleAvatarSelect = (emoji) => {
-    setAvatar(emoji);
-    localStorage.setItem('profile_avatar', emoji);
+  const handleAvatarSelect = (key) => {
+    setAvatar(key);
+    localStorage.setItem('profile_avatar', key);
     setShowAvatarPicker(false);
   };
 
@@ -223,14 +229,14 @@ export default function ProfilePage() {
 
       <nav className="nav-top">
         <button onClick={() => navigate('/diary')} className="btn-ghost">
-          ← 일기로
+         <ArrowLeft size="1em" /> 일기로
         </button>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 18, color: 'var(--primary)' }}>프로필</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>{today}</p>
         </div>
         <button onClick={toggleTheme} className="btn-icon">
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? <Sun size="1em" /> : <Moon size="1em" />}
         </button>
       </nav>
 
@@ -252,7 +258,7 @@ export default function ProfilePage() {
                   transition: 'border 0.15s',
                 }}
               >
-                {avatar}
+                {(() => { const A = avatarIcon(avatar); return <A size="1em" strokeWidth={1.75} />; })()}
               </div>
 
               {showAvatarPicker && (
@@ -271,9 +277,12 @@ export default function ProfilePage() {
                         fontSize: 22, padding: '6px 8px', borderRadius: 8, border: 'none',
                         background: avatar === e ? 'var(--primary-light)' : 'transparent',
                         cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: 'var(--text)',
                       }}
+                      aria-label={e}
                     >
-                      {e}
+                      {(() => { const A = avatarIcon(e); return <A size="1em" strokeWidth={1.75} />; })()}
                     </button>
                   ))}
                 </div>
@@ -309,7 +318,7 @@ export default function ProfilePage() {
               onClick={() => setEditingName(true)}
               style={{ padding: '8px 18px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', fontSize: 13, borderRadius: 10 }}
             >
-              ✏️ 닉네임 변경
+             <Pencil size="1em" /> 닉네임 변경
             </button>
           )}
 
@@ -338,7 +347,7 @@ export default function ProfilePage() {
                 {streak}
               </p>
               <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                {streak > 0 ? '일째 🔥' : '일째'}
+                일째
               </p>
             </div>
 
@@ -417,7 +426,7 @@ export default function ProfilePage() {
             <h3 style={{ fontFamily: 'Nanum Myeongjo, serif', fontSize: 17, color: 'var(--text)' }}>관심사</h3>
             {!editingPrefs && (
               <button onClick={() => setEditingPrefs(true)} className="btn-secondary" style={{ padding: '6px 14px', fontSize: 13, borderRadius: 10 }}>
-                ✏️ 수정
+               <Pencil size="1em" /> 수정
               </button>
             )}
           </div>
@@ -432,7 +441,7 @@ export default function ProfilePage() {
                       const cat = CATEGORIES.find((c) => c.key === key);
                       return (
                         <span key={key} style={{ padding: '5px 12px', background: 'var(--primary-light)', color: 'var(--primary-dark)', borderRadius: 20, fontSize: 13 }}>
-                          {cat?.icon} {key}
+                          {(() => { const H = HOBBY_ICONS[cat?.key]; return H ? <H size="1em" /> : null; })()} {key}
                         </span>
                       );
                     })}
@@ -447,7 +456,7 @@ export default function ProfilePage() {
                       const cat = CATEGORIES.find((c) => c.key === key);
                       return (
                         <span key={key} style={{ padding: '5px 12px', background: '#fde8e8', color: '#e07070', borderRadius: 20, fontSize: 13 }}>
-                          {cat?.icon} {key}
+                          {(() => { const H = HOBBY_ICONS[cat?.key]; return H ? <H size="1em" /> : null; })()} {key}
                         </span>
                       );
                     })}
@@ -475,11 +484,11 @@ export default function ProfilePage() {
               <div style={{ marginBottom: 20 }}>
                 <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 10 }}>좋아하는 것</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {CATEGORIES.map(({ key, icon }) => {
+                  {CATEGORIES.map(({ key }) => {
                     const sel = likes.has(key);
                     return (
                       <button key={key} onClick={() => toggleLike(key)} style={{ padding: '7px 13px', borderRadius: 20, fontSize: 12, background: sel ? 'var(--primary)' : 'var(--bg)', color: sel ? 'white' : 'var(--text)', border: sel ? '1px solid var(--primary)' : '1px solid var(--border)', cursor: 'pointer', transition: 'all 0.15s' }}>
-                        {icon} {key}
+                        {(() => { const H = HOBBY_ICONS[key]; return H ? <H size="1em" /> : null; })()} {key}
                       </button>
                     );
                   })}
@@ -490,11 +499,11 @@ export default function ProfilePage() {
                   싫어하는 것 <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: 11 }}>(선택 사항)</span>
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {CATEGORIES.map(({ key, icon }) => {
+                  {CATEGORIES.map(({ key }) => {
                     const sel = dislikes.has(key);
                     return (
                       <button key={key} onClick={() => toggleDislike(key)} style={{ padding: '7px 13px', borderRadius: 20, fontSize: 12, background: sel ? '#fde8e8' : 'var(--bg)', color: sel ? '#e07070' : 'var(--text)', border: sel ? '1px solid #e08080' : '1px solid var(--border)', cursor: 'pointer', transition: 'all 0.15s' }}>
-                        {icon} {key}
+                        {(() => { const H = HOBBY_ICONS[key]; return H ? <H size="1em" /> : null; })()} {key}
                       </button>
                     );
                   })}

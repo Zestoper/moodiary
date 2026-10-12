@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login, register } from '../api/auth';
+import { Leaf } from 'lucide-react';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ export default function LoginPage() {
       }}>
 
         <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>🌿</div>
+          <div style={{ fontSize: 40, marginBottom: 8, color: 'var(--primary)' }}><Leaf size="1em" strokeWidth={1.75} /></div>
           <h1 style={{
             fontFamily: 'Nanum Myeongjo, serif',
             fontSize: 28,
