@@ -45,3 +45,9 @@ app.include_router(admin.router,    prefix="/api/admin",    tags=["admin"])
 @app.get("/")
 def root():
     return {"message": "Moodiary API"}
+
+
+# 프론트 ServerWakeGate·UptimeRobot(HEAD) 용 가벼운 헬스체크
+@app.api_route("/health", methods=["GET", "HEAD"])
+def health_check():
+    return {"status": "ok"}
