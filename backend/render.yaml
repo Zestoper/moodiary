@@ -15,6 +15,8 @@ services:
         value: "10080"
       - key: GROQ_API_KEY
         sync: false
+      - key: CEREBRAS_API_KEY
+        sync: false        # 선택 — Groq 한도 소진 시 폴백
       - key: YOUTUBE_API_KEY
         sync: false
       - key: FRONTEND_URL
