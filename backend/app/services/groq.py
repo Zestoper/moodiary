@@ -11,8 +11,16 @@ from ..core.config import settings   # .env의 GROQ_API_KEY를 가져옴
 client = Groq(api_key=settings.GROQ_API_KEY)
 
 # 모델명 상수. 변경 시 이 두 줄만 수정하면 됨
-MODEL_GENERAL = "llama-3.3-70b-versatile"  # 감정 분석, 솔루션, 리포트, 연애 상담에 사용
-MODEL_CHAT    = "qwen/qwen3.6-27b"         # 실시간 채팅 스트리밍에 사용 (한국어 맞춤법 우수)
+MODEL_GENERAL = "openai/gpt-oss-120b"  # 감정 분석, 솔루션, 리포트, 연애 상담에 사용 (llama-3.3-70b-versatile 2026-08-16 종료)
+MODEL_CHAT    = "qwen/qwen3.8-27b"     # 실시간 채팅 스트리밍에 사용 (qwen3.6-27b 2026-09-14 종료 → 후속 모델)
+
+def _create(**kwargs):
+    # gpt-oss는 추론형 모델 — 답을 쓰기 전에 생각하는 토큰도 max_tokens에 포함된다.
+    # 그래서 추론은 짧게(low) 하고 그만큼 토큰 여유를 더 준다.
+    if str(kwargs.get("model", "")).startswith("openai/gpt-oss"):
+        kwargs.setdefault("reasoning_effort", "low")
+        kwargs["max_tokens"] = kwargs.get("max_tokens", 1024) + 512
+    return client.chat.completions.create(**kwargs)
 
 def _filter_cjk(text: str) -> str:
     # 한자/일본어/키릴 문자(러시아어 등)를 공백으로 대체. "그期間에" → "그 에"
@@ -30,10 +38,10 @@ def analyze_emotion(content: str) -> dict:
     # content: 일기 본문 텍스트. 예: "오늘 친구랑 밥을 먹었는데 너무 즐거웠다"
     # 반환값 예: {"emotion_tags": "기쁨,설렘", "emotion_score": 4}
 
-    response = client.chat.completions.create(
+    response = _create(
         model=MODEL_GENERAL,
         # Groq에서 제공하는 무료 모델
-        # llama-3.3-70b-versatile: 700억 파라미터. 정확도 높고 무료
+        # openai/gpt-oss-120b: OpenAI 공개 모델을 Groq에서 무료로 사용
 
         messages=[
             {
@@ -139,7 +147,7 @@ def chat_with_ai(messages: list, diary_context: str = "") -> str:
         system_prompt += f"\n\n사용자의 최근 일기 내용: {diary_context}"
         # 일기 내용이 있으면 AI가 맥락을 알고 더 공감적인 답변을 할 수 있음
 
-    response = client.chat.completions.create(
+    response = _create(
         model=MODEL_GENERAL,
         messages=[
             {"role": "system", "content": system_prompt},
@@ -164,7 +172,7 @@ def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = 
     if diary_context:
         system_prompt += f"\n\n사용자의 최근 일기 내용: {diary_context}"
 
-    stream = client.chat.completions.create(
+    stream = _create(
         model=MODEL_CHAT,
         # qwen3 계열: 한국어 맞춤법·띄어쓰기가 llama보다 훨씬 정확함
         messages=[
@@ -201,7 +209,7 @@ def generate_monthly_report(diaries: list, year: int, month: int) -> str:
         f"[{d['date']}] {d['title']}\n감정: {d.get('emotion_tags') or '없음'} ({d.get('emotion_score') or '?'}점)\n{d['content'][:150]}"
         for d in diaries
     ])
-    response = client.chat.completions.create(
+    response = _create(
         model=MODEL_GENERAL,
         messages=[
             {
@@ -233,7 +241,7 @@ def generate_solution(diary_content: str, emotion_score: int, emotion_tags: str,
     likes = ', '.join(preferences.get('likes', [])) or '없음'
     dislikes = ', '.join(preferences.get('dislikes', [])) or '없음'
 
-    response = client.chat.completions.create(
+    response = _create(
         model=MODEL_GENERAL,
         messages=[
             {
@@ -268,7 +276,7 @@ def analyze_relationship(situation: str, my_action: str, partner_action: str) ->
     # partner_action: 상대방이 한 행동
     # 반환값 예: {"verdict": "상대방 잘못", "message_script": "자기야, 나 좀 서운했어..."}
 
-    response = client.chat.completions.create(
+    response = _create(
         model=MODEL_GENERAL,
         messages=[
             {
