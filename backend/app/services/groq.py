@@ -4,6 +4,7 @@
 import json                          # AI 응답(문자열)을 dict로 파싱할 때 사용
 import re                            # 한자/일본어 필터링용 정규식
 from groq import Groq                # Groq 클라이언트 클래스. API 호출의 시작점
+from groq import APIConnectionError, APIStatusError, APITimeoutError, RateLimitError  # 모델 폴백용 예외
 from ..core.config import settings   # .env의 GROQ_API_KEY를 가져옴
 
 # Groq 클라이언트 인스턴스 생성. 앱 전체에서 이 하나를 공유함
@@ -14,13 +15,35 @@ client = Groq(api_key=settings.GROQ_API_KEY)
 MODEL_GENERAL = "openai/gpt-oss-120b"  # 감정 분석, 솔루션, 리포트, 연애 상담에 사용 (llama-3.3-70b-versatile 2026-08-16 종료)
 MODEL_CHAT    = "qwen/qwen3.8-27b"     # 실시간 채팅 스트리밍에 사용 (qwen3.6-27b 2026-09-14 종료 → 후속 모델)
 
+# 한 모델이 막히면(한도 초과 · 모델 폐기 · 서버 오류) 다음 모델로 넘어가는 순서
+# Groq 무료 한도는 모델별로 따로라서 다른 모델로 넘기면 계속 쓸 수 있다
+_GENERAL_CHAIN = (MODEL_GENERAL, "openai/gpt-oss-20b", "qwen/qwen3.8-27b")
+_CHAT_CHAIN    = (MODEL_CHAT, "openai/gpt-oss-20b", "openai/gpt-oss-120b")
+
 def _create(**kwargs):
-    # gpt-oss는 추론형 모델 — 답을 쓰기 전에 생각하는 토큰도 max_tokens에 포함된다.
-    # 그래서 추론은 짧게(low) 하고 그만큼 토큰 여유를 더 준다.
-    if str(kwargs.get("model", "")).startswith("openai/gpt-oss"):
-        kwargs.setdefault("reasoning_effort", "low")
-        kwargs["max_tokens"] = kwargs.get("max_tokens", 1024) + 512
-    return client.chat.completions.create(**kwargs)
+    first = kwargs.get("model")
+    chain = _CHAT_CHAIN if first == MODEL_CHAT else _GENERAL_CHAIN if first == MODEL_GENERAL else (first,)
+    base_max = kwargs.get("max_tokens", 1024)
+    last_err = None
+    for model in chain:
+        kw = dict(kwargs, model=model)
+        kw.pop("reasoning_effort", None)
+        if model.startswith("openai/gpt-oss"):
+            # gpt-oss는 추론형 모델 — 생각하는 토큰도 max_tokens에 포함되므로 짧게 생각하고 여유를 더 준다
+            kw["reasoning_effort"] = "low"
+            kw["max_tokens"] = base_max + 512
+        elif model.startswith("qwen/"):
+            kw["reasoning_effort"] = "none"  # qwen 생각 모드 끔 (빠른 응답)
+        try:
+            return client.chat.completions.create(**kw)
+        except (RateLimitError, APIConnectionError, APITimeoutError) as e:
+            last_err = e
+        except APIStatusError as e:
+            if e.status_code not in (404, 413, 500, 502, 503, 504):
+                raise
+            last_err = e
+        print(f"[Groq] {model} 실패 — 다음 모델 시도: {type(last_err).__name__}")
+    raise last_err
 
 def _filter_cjk(text: str) -> str:
     # 한자/일본어/키릴 문자(러시아어 등)를 공백으로 대체. "그期間에" → "그 에"
