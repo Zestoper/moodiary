@@ -3,6 +3,8 @@
 
 import json                          # AI 응답(문자열)을 dict로 파싱할 때 사용
 import re                            # 한자/일본어 필터링용 정규식
+from types import SimpleNamespace    # Cerebras 응답을 Groq 응답과 같은 모양으로 맞출 때 사용
+import httpx                         # Cerebras API 호출 (groq 패키지가 이미 설치해 둠)
 from groq import Groq                # Groq 클라이언트 클래스. API 호출의 시작점
 from groq import APIConnectionError, APIStatusError, APITimeoutError, RateLimitError  # 모델 폴백용 예외
 from ..core.config import settings   # .env의 GROQ_API_KEY를 가져옴
@@ -43,7 +45,62 @@ def _create(**kwargs):
                 raise
             last_err = e
         print(f"[Groq] {model} 실패 — 다음 모델 시도: {type(last_err).__name__}")
+
+    # Groq 모델이 전부 막히면 Cerebras로 폴백 (키가 있을 때만)
+    if settings.CEREBRAS_API_KEY:
+        print("[Cerebras] Groq 모델 전부 실패 — Cerebras로 폴백")
+        return _cerebras_create(kwargs, base_max)
     raise last_err
+
+_CEREBRAS_URL   = "https://api.cerebras.ai/v1/chat/completions"
+_CEREBRAS_MODEL = "gpt-oss-120b"
+
+def _cerebras_create(kwargs: dict, base_max: int):
+    # Groq와 같은 OpenAI 호환 API — 응답을 Groq 응답과 같은 모양으로 감싸서
+    # 호출한 함수들이 response.choices[0].message.content / chunk.choices[0].delta.content 그대로 쓰게 한다
+    body = {
+        "model": _CEREBRAS_MODEL,
+        "messages": kwargs["messages"],
+        "max_tokens": base_max + 512,  # 추론형 모델이라 여유분 추가
+        "reasoning_effort": "low",
+    }
+    if "temperature" in kwargs:
+        body["temperature"] = kwargs["temperature"]
+    headers = {"Authorization": f"Bearer {settings.CEREBRAS_API_KEY}"}
+
+    if not kwargs.get("stream"):
+        res = httpx.post(_CEREBRAS_URL, headers=headers, json=body, timeout=60.0)
+        res.raise_for_status()
+        content = res.json()["choices"][0]["message"].get("content") or ""
+        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=content))])
+
+    # 스트리밍: 연결과 상태 코드를 먼저 확인한 뒤 청크를 하나씩 넘긴다
+    http = httpx.Client(timeout=60.0)
+    res = http.send(http.build_request("POST", _CEREBRAS_URL, headers=headers, json={**body, "stream": True}), stream=True)
+    if res.status_code != 200:
+        res.read()
+        res.close()
+        http.close()
+        raise RuntimeError(f"Cerebras {res.status_code}: {res.text[:200]}")
+
+    def _chunks():
+        try:
+            for line in res.iter_lines():
+                if not line.startswith("data: "):
+                    continue
+                data = line[6:]
+                if data == "[DONE]":
+                    break
+                try:
+                    text = json.loads(data)["choices"][0]["delta"].get("content") or ""
+                except (ValueError, KeyError, IndexError):
+                    continue
+                yield SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content=text))])
+        finally:
+            res.close()
+            http.close()
+
+    return _chunks()
 
 def _filter_cjk(text: str) -> str:
     # 한자/일본어/키릴 문자(러시아어 등)를 공백으로 대체. "그期間에" → "그 에"
