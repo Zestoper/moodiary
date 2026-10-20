@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import auth, diary, chat, consult, music, report, payment, admin
@@ -27,7 +28,12 @@ def migrate_db():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    # 우리 프런트(배포 · Vercel 미리보기 · 로컬)만 허용. 다른 주소는 CORS_ORIGINS 환경변수에 쉼표로 추가
+    allow_origins=[o.strip() for o in os.getenv(
+        "CORS_ORIGINS",
+        "https://moodiary-five.vercel.app,https://moodiary.vercel.app,http://localhost:3000",
+    ).split(",") if o.strip()],
+    allow_origin_regex=r"https://moodiary[a-z0-9-]*\.vercel\.app",
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
