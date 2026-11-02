@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from ..core.database import get_db
+from ..models.chat import ChatMessage
 from ..models.diary import Diary
 from ..models.user import User
 from ..schemas.diary import DiaryCreate, DiaryUpdate, DiaryResponse
@@ -129,6 +130,11 @@ def delete_diary(
     if diary is None:
         raise HTTPException(status_code=404, detail="일기를 찾을 수 없습니다")
 
+    # 채팅 FK가 ON DELETE SET NULL 이라 그냥 지우면 이 일기의 대화가 diary_id=NULL(일반 채팅)로 섞여 들어갔다
+    # → 일기 대화는 일기와 함께 지운다 (운영 DB 제약을 바꾸지 않고 애플리케이션에서 처리)
+    db.query(ChatMessage).filter(
+        ChatMessage.diary_id == diary.id, ChatMessage.user_id == current_user.id
+    ).delete(synchronize_session=False)
     db.delete(diary)
     db.commit()
 

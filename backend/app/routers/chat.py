@@ -32,6 +32,30 @@ def get_chat_history(
 
     return query.order_by(ChatMessage.created_at.asc()).all()
 
+CONTEXT_MESSAGES = 20
+
+
+def _load_chat_context(db: Session, user_id: int, diary_id: Optional[int]):
+    """
+    AI에 넘길 맥락을 만든다.
+    - 일기 본문: 그 일기의 감정 맥락
+    - 이전 대화: **같은 일기에서 나눈 대화만** (diary_id=None 이면 일반 채팅끼리만)
+      일기마다 감정이 달라서 섞이면 엉뚱한 위로를 하기 때문에 대화방을 일기 단위로 나눴다
+    - 최근 CONTEXT_MESSAGES 개만 (예전엔 오래된 순으로 20개를 잘라 대화가 길어지면 최근 대화를 못 봤다)
+    """
+    diary_context = ""
+    if diary_id:
+        diary = db.query(Diary).filter(Diary.id == diary_id, Diary.user_id == user_id).first()
+        if diary:
+            diary_context = diary.content
+
+    q = db.query(ChatMessage).filter(ChatMessage.user_id == user_id)
+    q = q.filter(ChatMessage.diary_id == diary_id) if diary_id is not None else q.filter(ChatMessage.diary_id == None)  # noqa: E711
+    recent = q.order_by(ChatMessage.created_at.desc(), ChatMessage.id.desc()).limit(CONTEXT_MESSAGES).all()
+    recent.reverse()   # 최신 20개를 다시 시간 순으로
+    return diary_context, [{"role": m.role, "content": m.content} for m in recent]
+
+
 @router.post("/send", response_model=ChatResponse, status_code=201)
 def send_message(
     body: ChatMessageCreate,
@@ -39,27 +63,8 @@ def send_message(
     current_user: User = Depends(get_current_user)
 ):
 
-    diary_context = ""
-
-    if body.diary_id:
-
-        diary = db.query(Diary)\
-            .filter(Diary.id == body.diary_id, Diary.user_id == current_user.id)\
-            .first()
-
-        if diary:
-            diary_context = diary.content
-
-    previous_messages = db.query(ChatMessage)\
-        .filter(ChatMessage.user_id == current_user.id)\
-        .order_by(ChatMessage.created_at.asc())\
-        .limit(20)\
-        .all()
-
-    messages_for_ai = [
-        {"role": msg.role, "content": msg.content}
-        for msg in previous_messages
-    ]
+    # 예전엔 이 API만 일기 구분 없이 모든 대화를 섞어서 보냈다 → 스트리밍 API와 같은 함수로 통일
+    diary_context, messages_for_ai = _load_chat_context(db, current_user.id, body.diary_id)
 
     messages_for_ai.append({"role": "user", "content": body.content})
 
@@ -114,23 +119,7 @@ def stream_message(
     current_user: User = Depends(get_current_user)
 ):
 
-    diary_context = ""
-    if body.diary_id:
-        diary = db.query(Diary)\
-            .filter(Diary.id == body.diary_id, Diary.user_id == current_user.id)\
-            .first()
-        if diary:
-            diary_context = diary.content
-
-    prev_query = db.query(ChatMessage).filter(ChatMessage.user_id == current_user.id)
-    if body.diary_id is not None:
-        prev_query = prev_query.filter(ChatMessage.diary_id == body.diary_id)
-    else:
-        prev_query = prev_query.filter(ChatMessage.diary_id == None)
-
-    previous_messages = prev_query.order_by(ChatMessage.created_at.asc()).limit(20).all()
-
-    messages_for_ai = [{"role": m.role, "content": m.content} for m in previous_messages]
+    diary_context, messages_for_ai = _load_chat_context(db, current_user.id, body.diary_id)
     messages_for_ai.append({"role": "user", "content": body.content})
 
     user_msg = ChatMessage(user_id=current_user.id, role="user", content=body.content, diary_id=body.diary_id)
