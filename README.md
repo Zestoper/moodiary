@@ -2,7 +2,7 @@
 
 > 감정 일기를 쓰면 AI가 공감해주고, 감정 변화를 시각화해주는 **감정 기반 AI 다이어리 플랫폼**
 
-**서비스**: https://moodiary-five.vercel.app · **API**: https://moodiary-0she.onrender.com  
+**서비스**: https://moodiary-five.vercel.app  
 > 백엔드는 Render 무료 플랜이라 처음 접속 시 서버가 깨어나는 데 최대 1분 정도 걸립니다.  
 **개발자**: 박준영 (1인 풀스택)
 
