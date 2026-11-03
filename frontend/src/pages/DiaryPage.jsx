@@ -369,6 +369,7 @@ export default function DiaryPage() {
           {/* 데스크탑 전용 메뉴 */}
           <div className="desktop-only" style={{ gap: 6, alignItems: 'center' }}>
             <button onClick={() => navigate('/calendar')} style={{ padding: '7px 14px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontSize: 13 }}>캘린더</button>
+            <button onClick={() => navigate('/recap')} style={{ padding: '7px 14px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontSize: 13 }}>감정 결산</button>
             <button onClick={() => navigate('/chat')} style={{ padding: '7px 14px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontSize: 13 }}>AI 채팅</button>
             <button onClick={() => navigate('/consult')} style={{ padding: '7px 14px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontSize: 13 }}>연애 상담</button>
             <button onClick={() => navigate('/profile')} style={{ padding: '7px 14px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontSize: 13 }}>프로필</button>

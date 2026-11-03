@@ -16,6 +16,7 @@ class ChatMessageResponse(BaseModel):
     role: str
     content: str
     diary_id: Optional[int] = None
+    memory_refs: Optional[str] = None
     created_at: datetime
 
     class Config:

@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timedelta
 import requests
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -12,6 +13,8 @@ from ..models.user import User
 from ..routers.auth import get_current_user
 
 router = APIRouter()
+
+TEST_CHARGES_PER_DAY = 3
 
 PACKAGES = [
     {"id": "credits_5",  "credits": 5,  "amount": 1500, "label": "5 크레딧"},
@@ -95,7 +98,19 @@ def verify_payment(
             raise HTTPException(status_code=400, detail="결제 검증에 실패했습니다")
         status = "paid"
     else:
-
+        # 테스트 모드(PortOne 키 없음)는 실제 결제 확인 없이 크레딧을 주므로
+        # 데모 체험용으로 하루 TEST_CHARGES_PER_DAY번까지만 허용한다 (무한 충전 방지)
+        since = datetime.utcnow() - timedelta(days=1)
+        used = (
+            db.query(Payment)
+            .filter(Payment.user_id == current_user.id, Payment.status == "test", Payment.created_at >= since)
+            .count()
+        )
+        if used >= TEST_CHARGES_PER_DAY:
+            raise HTTPException(
+                status_code=429,
+                detail=f"테스트 결제는 하루 {TEST_CHARGES_PER_DAY}번까지 가능합니다",
+            )
         status = "test"
 
     payment = Payment(

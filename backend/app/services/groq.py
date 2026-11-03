@@ -201,7 +201,32 @@ LANGUAGE_RULE = """[언어 규칙]
 이러한 형태는 절대 쓰지 마세요: 잘면, 갈면, 올면, 잘야."""
 
 # ── AI 친구 채팅 함수 ─────────────────────────────────────────────────────────────
-def chat_with_ai(messages: list, diary_context: str = "") -> str:
+def extract_memory(title: str, content: str, written: "date") -> dict:
+    """일기에서 나중에 떠올릴 기억 · 검색 핵심어 · 후속 질문을 뽑는다 (services/memory.py 에서 사용)."""
+    response = _create(
+        model=MODEL_GENERAL,
+        messages=[
+            {"role": "system", "content": (
+                "당신은 일기에서 '친구가 기억해 둘 만한 것'을 뽑는 도우미입니다. JSON 하나만 출력하세요.\n"
+                '{"memory": "1~2문장", "keywords": ["핵심어"], "follow_up": {"question": "질문", "date": "YYYY-MM-DD"} 또는 null}\n\n'
+                "규칙:\n"
+                "- memory: 무슨 일이 있었고 어떤 기분이었는지 3인칭 없이 간결하게 (예: '동생과 다퉈서 속상했고 먼저 사과할지 고민함')\n"
+                "- keywords: 사람·장소·사건·대상 위주 명사 3~6개 (예: 동생, 다툼, 사과). 감정 단어만 넣지 말 것\n"
+                "- follow_up: 일기에 앞으로 있을 일(시험, 면접, 약속, 병원, 발표 등)과 날짜를 알 수 있을 때만. "
+                f"date는 그 일이 있는 날. 일기 쓴 날은 {written.isoformat()}이고 '내일' '다음주 월요일' 같은 표현은 이 날 기준으로 계산. "
+                "question은 그날 이후 친구가 물어볼 말투로 (예: '면접은 잘 봤어?'). 앞으로 있을 일이 없으면 null\n"
+                "- 한국어만 사용"
+            )},
+            {"role": "user", "content": f"제목: {title}\n본문: {content[:3000]}"},
+        ],
+        temperature=0.2,
+        max_tokens=300,
+    )
+    raw = response.choices[0].message.content or ""
+    m = re.search(r"\{.*\}", raw, re.DOTALL)
+    return json.loads(m.group()) if m else {}
+
+def chat_with_ai(messages: list, diary_context: str = "", memory_context: str = "") -> str:
     # 사용자와 AI의 대화 내역을 받아서 AI 응답을 반환하는 함수
     # messages: 지금까지의 대화 목록. [{"role": "user", "content": "..."}, ...]
     # diary_context: 일기 내용. AI가 맥락을 이해하고 공감하는 데 사용. 없어도 됨
@@ -225,6 +250,8 @@ def chat_with_ai(messages: list, diary_context: str = "") -> str:
 
     if diary_context:
         system_prompt += f"\n\n사용자의 최근 일기 내용: {diary_context}"
+    if memory_context:
+        system_prompt += f"\n\n{memory_context}"
         # 일기 내용이 있으면 AI가 맥락을 알고 더 공감적인 답변을 할 수 있음
 
     response = _create(
@@ -244,13 +271,15 @@ def chat_with_ai(messages: list, diary_context: str = "") -> str:
     # AI의 텍스트 응답만 꺼내서 반환. 한자/일본어가 섞여 있으면 제거
 
 # ── AI 친구 채팅 스트리밍 함수 ────────────────────────────────────────────────────
-def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = "friend"):
+def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = "friend", memory_context: str = ""):
     # persona: 선택된 AI 말투 스타일. PERSONA_PROMPTS 딕셔너리에서 해당 프롬프트를 가져옴
     persona_text = PERSONA_PROMPTS.get(persona, PERSONA_PROMPTS["friend"])
     system_prompt = f"{LANGUAGE_RULE}\n\n[역할 - 절대 유지]\n이전 대화 스타일과 관계없이 아래 역할만 따르세요.\n{persona_text}"
 
     if diary_context:
         system_prompt += f"\n\n사용자의 최근 일기 내용: {diary_context}"
+    if memory_context:
+        system_prompt += f"\n\n{memory_context}"
 
     stream = _create(
         model=MODEL_CHAT,
@@ -281,6 +310,23 @@ def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = 
         if filtered:
             started = True
             yield filtered
+
+def generate_recap_line(stats: dict) -> str:
+    """감정 결산 카드 마지막 장의 한 줄 총평 (숫자는 코드가 계산한 것만 근거로)."""
+    summary = {k: stats.get(k) for k in ("period", "count", "avg_score", "top_emotions", "best_weekday", "weather", "longest_streak")}
+    response = _create(
+        model=MODEL_GENERAL,
+        messages=[
+            {"role": "system", "content": (
+                f"{LANGUAGE_RULE}\n\n당신은 따뜻한 친구입니다. 감정 일기 통계를 보고 그 기간을 돌아보는 한두 문장을 쓰세요.\n"
+                "- 반말, 다정하게, 60자 안팎\n- 통계에 있는 사실만 근거로 (숫자를 지어내지 말 것)\n- 문장만 출력"
+            )},
+            {"role": "user", "content": json.dumps(summary, ensure_ascii=False)},
+        ],
+        temperature=0.7,
+        max_tokens=120,
+    )
+    return _filter_cjk(response.choices[0].message.content or "").strip()
 
 # ── 월간 감정 리포트 함수 ─────────────────────────────────────────────────────────
 def generate_monthly_report(diaries: list, year: int, month: int) -> str:

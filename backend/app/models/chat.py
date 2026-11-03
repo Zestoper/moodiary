@@ -12,6 +12,7 @@ class ChatMessage(Base):
     role = Column(String(20), nullable=False)
     content = Column(Text, nullable=False)
     diary_id = Column(Integer, ForeignKey("diaries.id", ondelete="SET NULL"), nullable=True)
+    memory_refs = Column(Text, nullable=True)   # 이 답장이 떠올린 예전 일기 목록 (JSON) — 화면에 '기억' 칩으로 표시
 
     created_at = Column(DateTime, server_default=func.now())
 

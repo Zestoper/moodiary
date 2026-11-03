@@ -4,6 +4,7 @@ import { ToastProvider } from './context/ToastContext';
 import ServerWakeGate from './components/ServerWakeGate';
 import LoginPage from './pages/LoginPage';
 import DiaryPage from './pages/DiaryPage';
+import RecapPage from './pages/RecapPage';
 import ChatPage from './pages/ChatPage';
 import CalendarPage from './pages/CalendarPage';
 import ConsultPage from './pages/ConsultPage';
@@ -25,6 +26,7 @@ function App() {
               <Route path="/diary"    element={<DiaryPage />} />
               <Route path="/chat"     element={<ChatPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/recap"    element={<RecapPage />} />
               <Route path="/consult"  element={<ConsultPage />} />
               <Route path="/profile"    element={<ProfilePage />} />
               <Route path="/onboarding" element={<OnboardingPage />} />
