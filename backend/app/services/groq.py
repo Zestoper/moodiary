@@ -311,6 +311,23 @@ def chat_with_ai_stream(messages: list, diary_context: str = "", persona: str = 
             started = True
             yield filtered
 
+def generate_recap_line(stats: dict) -> str:
+    """감정 결산 카드 마지막 장의 한 줄 총평 (숫자는 코드가 계산한 것만 근거로)."""
+    summary = {k: stats.get(k) for k in ("period", "count", "avg_score", "top_emotions", "best_weekday", "weather", "longest_streak")}
+    response = _create(
+        model=MODEL_GENERAL,
+        messages=[
+            {"role": "system", "content": (
+                f"{LANGUAGE_RULE}\n\n당신은 따뜻한 친구입니다. 감정 일기 통계를 보고 그 기간을 돌아보는 한두 문장을 쓰세요.\n"
+                "- 반말, 다정하게, 60자 안팎\n- 통계에 있는 사실만 근거로 (숫자를 지어내지 말 것)\n- 문장만 출력"
+            )},
+            {"role": "user", "content": json.dumps(summary, ensure_ascii=False)},
+        ],
+        temperature=0.7,
+        max_tokens=120,
+    )
+    return _filter_cjk(response.choices[0].message.content or "").strip()
+
 # ── 월간 감정 리포트 함수 ─────────────────────────────────────────────────────────
 def generate_monthly_report(diaries: list, year: int, month: int) -> str:
     # 한 달 치 일기를 받아서 서술형 감정 리포트 생성

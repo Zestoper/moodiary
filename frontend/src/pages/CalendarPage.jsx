@@ -418,6 +418,12 @@ export default function CalendarPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: report ? 14 : 0 }}>
               <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>
                 {year}년 {month + 1}월 감정 리포트
+                <button
+                  onClick={() => navigate('/recap')}
+                  style={{ marginLeft: 8, padding: '3px 10px', background: 'var(--primary-light)', color: 'var(--primary-dark)', fontSize: 12, fontWeight: 600, borderRadius: 999 }}
+                >
+                  감정 결산 카드 보기
+                </button>
               </p>
               {!report && (
                 <button

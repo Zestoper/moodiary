@@ -1,0 +1,57 @@
+.recap-page { min-height: 100vh; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 0 16px 32px; }
+.recap-top { width: 100%; max-width: 420px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 16px 0 12px; }
+.recap-back { display: inline-flex; align-items: center; gap: 4px; }
+.recap-tabs { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 3px; }
+.recap-tabs button { padding: 5px 12px; font-size: 12px; border-radius: 999px; background: none; color: var(--text-muted); }
+.recap-tabs button.active { background: var(--primary); color: #fff; font-weight: 600; }
+
+.recap-progress { width: 100%; max-width: 380px; display: flex; gap: 4px; margin-bottom: 10px; }
+.recap-progress span { flex: 1; height: 3px; border-radius: 3px; background: var(--border); transition: background .3s; }
+.recap-progress span.on { background: var(--primary); }
+
+.recap-stage { width: 100%; max-width: 380px; }
+.recap-card {
+  width: 100%; aspect-ratio: 9 / 14; border-radius: 24px; padding: 32px 26px;
+  color: #fff; display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  box-shadow: 0 18px 40px rgba(80, 40, 20, .25); cursor: pointer; user-select: none;
+  position: relative; overflow: hidden; animation: recap-in .45s cubic-bezier(.2,.8,.2,1);
+}
+.recap-card::after { content: ''; position: absolute; width: 260px; height: 260px; right: -90px; top: -90px; border-radius: 50%; background: rgba(255,255,255,.12); }
+@keyframes recap-in { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+.recap-skeleton { background: var(--border); animation: recap-pulse 1.2s ease-in-out infinite; max-width: 380px; }
+@keyframes recap-pulse { 50% { opacity: .5; } }
+
+.recap-kicker { font-size: 12px; letter-spacing: .12em; opacity: .85; font-weight: 500; }
+.recap-big { font-family: 'Nanum Myeongjo', serif; font-size: 30px; line-height: 1.35; font-weight: 800; }
+.recap-huge { font-family: 'Nanum Myeongjo', serif; font-size: 64px; line-height: 1.1; font-weight: 800; }
+.recap-sub { font-size: 15px; opacity: .92; }
+.recap-quote { font-family: 'Nanum Myeongjo', serif; font-size: 23px; line-height: 1.6; font-weight: 700; }
+.recap-brand { position: absolute; bottom: 22px; left: 26px; font-size: 13px; opacity: .75; letter-spacing: .08em; }
+
+.recap-bars { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.recap-bar-row { display: grid; grid-template-columns: 52px 1fr 38px; align-items: center; gap: 8px; font-size: 13px; }
+.recap-bar { height: 8px; border-radius: 8px; background: rgba(255,255,255,.25); overflow: hidden; }
+.recap-bar div { height: 100%; background: #fff; border-radius: 8px; }
+
+.recap-trend { width: 100%; margin-top: 18px; }
+.recap-grid { stroke: rgba(255,255,255,.25); stroke-width: 1; }
+.recap-line { fill: none; stroke: #fff; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.recap-dot { fill: #fff; }
+.recap-axis { fill: rgba(255,255,255,.8); font-size: 10px; }
+
+.recap-day { display: flex; flex-direction: column; gap: 4px; background: rgba(255,255,255,.16); border-radius: 16px; padding: 16px; margin-top: 8px; }
+.recap-day b { font-size: 19px; font-family: 'Nanum Myeongjo', serif; }
+.recap-day-label { font-size: 12px; opacity: .85; }
+
+.recap-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.recap-pills span { background: rgba(255,255,255,.2); border-radius: 999px; padding: 5px 11px; font-size: 13px; }
+.recap-pills small { opacity: .75; }
+
+.recap-controls { margin-top: 18px; display: flex; align-items: center; gap: 10px; }
+.recap-controls > button { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--text); display: flex; align-items: center; justify-content: center; }
+.recap-controls > button:disabled { opacity: .35; }
+.recap-controls .recap-share { width: auto; border-radius: 999px; padding: 0 16px; gap: 6px; background: var(--primary); color: #fff; border: none; font-weight: 600; font-size: 13px; }
+.recap-controls .recap-share.ghost { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+
+.recap-empty { margin-top: 80px; text-align: center; color: var(--text-muted); display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.recap-empty button { padding: 9px 18px; background: var(--primary); color: #fff; border-radius: 12px; font-weight: 600; }
