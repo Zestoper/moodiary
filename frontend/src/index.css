@@ -314,3 +314,24 @@ button:disabled {
   vertical-align: -0.125em;
   flex-shrink: 0;
 }
+
+/* AI 친구가 예전 일기에서 떠올린 기억 (ChatPage) */
+.memory-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px 44px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.memory-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--text);
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

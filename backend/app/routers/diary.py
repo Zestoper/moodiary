@@ -13,6 +13,7 @@ from ..routers.auth import get_current_user
 from ..services.groq import analyze_emotion, generate_solution
 from ..services.quota import check_and_consume
 import json
+from ..services.memory import build_memory_in_background
 
 router = APIRouter()
 
@@ -62,6 +63,9 @@ def create_diary(
     db.add(new_diary)
     db.commit()
     db.refresh(new_diary)
+
+    # AI 친구가 나중에 떠올릴 기억을 만들어 둔다 (응답은 기다리지 않음)
+    build_memory_in_background(new_diary.id)
 
     return new_diary
 
@@ -113,6 +117,9 @@ def update_diary(
 
     db.commit()
     db.refresh(diary)
+
+    if body.content is not None:
+        build_memory_in_background(diary.id)   # 내용이 바뀌었으니 기억도 다시 만든다
 
     return diary
 

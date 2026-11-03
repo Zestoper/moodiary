@@ -3,8 +3,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getChatHistory, clearChatHistory } from '../api/chat';
 import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../context/ToastContext';
-import { ArrowLeft, Moon, Sprout, Sun } from 'lucide-react';
+import { ArrowLeft, BookHeart, Moon, Sprout, Sun } from 'lucide-react';
 import { PERSONA_ICONS } from '../icons';
+
+// AI 답장이 떠올린 예전 일기 목록 — 실시간 응답은 배열, 저장된 대화는 JSON 문자열로 온다
+function memoryRefs(msg) {
+  if (Array.isArray(msg.memory_refs)) return msg.memory_refs;
+  if (typeof msg.memory_refs === 'string') {
+    try { return JSON.parse(msg.memory_refs) || []; } catch { return []; }
+  }
+  return [];
+}
 
 export default function ChatPage() {
   const navigate = useNavigate();
@@ -99,7 +108,14 @@ export default function ChatPage() {
           try {
             const data = JSON.parse(jsonStr);
 
-            if (data.type === 'chunk') {
+            if (data.type === 'memory') {
+              // 답장보다 먼저 온다 — 이번 답장이 어떤 예전 일기를 떠올렸는지
+              setMessages((prev) => {
+                const newMsgs = [...prev];
+                newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], memory_refs: data.refs };
+                return newMsgs;
+              });
+            } else if (data.type === 'chunk') {
 
               setMessages((prev) => {
                 const newMsgs = [...prev];
@@ -177,7 +193,17 @@ export default function ChatPage() {
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 16 }}>
+          <div key={msg.id}>
+          {msg.role === 'assistant' && memoryRefs(msg).length > 0 && (
+            <div className="memory-chips" title="AI 친구가 예전 일기에서 떠올린 기억">
+              <BookHeart size={13} strokeWidth={2} />
+              <span>기억하고 있어요</span>
+              {memoryRefs(msg).map((r) => (
+                <span key={r.diary_id} className="memory-chip">{r.when} · {r.title}</span>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', marginBottom: 16 }}>
             {msg.role === 'assistant' && (
               <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 8, flexShrink: 0, fontSize: 18 }}>
                 {(() => { const P = PERSONA_ICONS[persona] || PERSONA_ICONS.friend; return <P size="1em" strokeWidth={1.75} />; })()}
@@ -200,6 +226,7 @@ export default function ChatPage() {
                 <span style={{ display: 'inline-block', width: 8, height: 14, background: 'var(--primary)', borderRadius: 2, animation: 'blink 1s step-end infinite', verticalAlign: 'middle' }} />
               )}
             </div>
+          </div>
           </div>
         ))}
 

@@ -24,6 +24,13 @@ def migrate_db():
     with engine.connect() as conn:
         conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT FALSE"))
         conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS credits INT NOT NULL DEFAULT 0"))
+        # AI 친구 기억 (services/memory.py)
+        conn.execute(text("ALTER TABLE diaries ADD COLUMN IF NOT EXISTS memory TEXT"))
+        conn.execute(text("ALTER TABLE diaries ADD COLUMN IF NOT EXISTS memory_keywords VARCHAR(255)"))
+        conn.execute(text("ALTER TABLE diaries ADD COLUMN IF NOT EXISTS follow_up VARCHAR(255)"))
+        conn.execute(text("ALTER TABLE diaries ADD COLUMN IF NOT EXISTS follow_up_date DATE"))
+        conn.execute(text("ALTER TABLE diaries ADD COLUMN IF NOT EXISTS follow_up_asked BOOLEAN NOT NULL DEFAULT FALSE"))
+        conn.execute(text("ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS memory_refs TEXT"))
         conn.commit()
 
 app.add_middleware(
