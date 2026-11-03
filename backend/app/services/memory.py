@@ -19,6 +19,7 @@ import json
 import math
 import re
 import threading
+from ..core.timeutil import kst_date, kst_today
 from datetime import date, datetime, timedelta
 
 from sqlalchemy.orm import Session
@@ -56,7 +57,7 @@ def _diary_terms(d: Diary) -> set[str]:
 
 
 def _days_ago(d: Diary, today: date) -> int:
-    created = d.created_at.date() if d.created_at else today
+    created = kst_date(d.created_at) or today
     return max((today - created).days, 0)
 
 
@@ -74,7 +75,7 @@ def _when(days: int) -> str:
 
 def recall(db: Session, user_id: int, query_text: str, current_diary_id: int | None = None) -> dict:
     """지금 대화와 관련된 예전 일기 기억 + 지금 물어볼 만한 후속 질문을 고른다."""
-    today = date.today()
+    today = kst_today()
     q_terms = tokens(query_text)
     current = None
     if current_diary_id:
@@ -102,7 +103,7 @@ def recall(db: Session, user_id: int, query_text: str, current_diary_id: int | N
 
     memories = [
         {"diary_id": d.id, "title": d.title, "when": _when(days),
-         "date": d.created_at.strftime("%Y-%m-%d") if d.created_at else None,
+         "date": kst_date(d.created_at).isoformat() if d.created_at else None,
          "text": d.memory or (d.content or "")[:120]}
         for _, days, d in scored[:MAX_MEMORIES]
     ]
@@ -151,7 +152,7 @@ def _build(diary_id: int) -> None:
         d = db.query(Diary).filter(Diary.id == diary_id).first()
         if not d:
             return
-        written = d.created_at.date() if d.created_at else date.today()
+        written = kst_date(d.created_at) or kst_today()
         data = extract_memory(d.title, d.content, written)
         d.memory = (data.get("memory") or "").strip()[:300] or None
         kws = data.get("keywords") or []

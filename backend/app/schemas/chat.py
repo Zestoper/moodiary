@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from ..core.timeutil import UTCDateTime
 
 class ChatMessageCreate(BaseModel):
 
@@ -17,7 +18,7 @@ class ChatMessageResponse(BaseModel):
     content: str
     diary_id: Optional[int] = None
     memory_refs: Optional[str] = None
-    created_at: datetime
+    created_at: UTCDateTime
 
     class Config:
         from_attributes = True

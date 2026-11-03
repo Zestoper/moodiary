@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from ..core.timeutil import UTCDateTime
 
 class ConsultCreate(BaseModel):
 
@@ -17,7 +18,7 @@ class ConsultResponse(BaseModel):
     partner_action: Optional[str]
     verdict: Optional[str]
     message_script: Optional[str]
-    created_at: datetime
+    created_at: UTCDateTime
 
     class Config:
         from_attributes = True
