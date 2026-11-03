@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from ..core.timeutil import iso_utc
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -82,7 +83,7 @@ def get_users(
                 "credits": r.credits,
                 "is_admin": r.is_admin,
                 "diary_count": r.diary_count,
-                "created_at": r.created_at.isoformat() if r.created_at else None,
+                "created_at": iso_utc(r.created_at),
             }
             for r in results
         ]
@@ -137,7 +138,7 @@ def get_all_payments(
                 "credits": p.credits,
                 "status": p.status,
                 "imp_uid": p.imp_uid,
-                "created_at": p.created_at.isoformat() if p.created_at else None,
+                "created_at": iso_utc(p.created_at),
             }
             for p, email, username in results
         ]

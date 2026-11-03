@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from ..core.database import get_db
+from ..core.timeutil import kst_date, kst_to_utc_naive
 from ..models.diary import Diary
 from ..models.user import User
 from ..routers.auth import get_current_user
@@ -24,8 +25,9 @@ def monthly_report(
 ):
 
     _, last_day = calendar.monthrange(year, month)
-    start = datetime(year, month, 1)
-    end = datetime(year, month, last_day, 23, 59, 59)
+    # 한국 시간 기준 그 달 1일 0시 ~ 말일 23:59:59 를 DB(UTC) 시각으로 바꿔 비교
+    start = kst_to_utc_naive(datetime(year, month, 1))
+    end = kst_to_utc_naive(datetime(year, month, last_day, 23, 59, 59))
 
     diaries = (
         db.query(Diary)
@@ -45,7 +47,7 @@ def monthly_report(
 
     diary_data = [
         {
-            "date": d.created_at.strftime("%Y-%m-%d"),
+            "date": kst_date(d.created_at).isoformat(),
             "title": d.title,
             "content": d.content[:150],
             "emotion_tags": d.emotion_tags,

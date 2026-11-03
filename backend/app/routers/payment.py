@@ -1,4 +1,5 @@
 import uuid
+from ..core.timeutil import iso_utc
 from datetime import datetime, timedelta
 import requests
 from fastapi import APIRouter, Depends, HTTPException
@@ -153,7 +154,7 @@ def get_payment_history(
                 "amount": p.amount,
                 "credits": p.credits,
                 "status": p.status,
-                "created_at": p.created_at.isoformat() if p.created_at else None,
+                "created_at": iso_utc(p.created_at),
             }
             for p in payments
         ]

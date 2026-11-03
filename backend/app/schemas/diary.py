@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+from ..core.timeutil import UTCDateTime
 
 class DiaryCreate(BaseModel):
     title: str
@@ -24,8 +25,8 @@ class DiaryResponse(BaseModel):
     weather_code: Optional[int]
     temperature: Optional[float]
     solution: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
+    created_at: UTCDateTime
+    updated_at: UTCDateTime
 
     class Config:
         from_attributes = True
