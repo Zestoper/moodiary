@@ -8,6 +8,7 @@ https://github.com/user-attachments/assets/3e44ed73-e043-4034-978c-3daf407cd771
 > 백엔드는 Render 무료 플랜이라 처음 접속 시 서버가 깨어나는 데 최대 1분 정도 걸립니다.
 
 **개발자**: 박준영 (1인 풀스택)
+
 ---
 
 ## 주요 기능
