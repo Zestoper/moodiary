@@ -1,11 +1,13 @@
-# 📔 Moodiary
+# 📔Moodiary — 감정 기반 AI 다이어리 플랫폼
+감정 일기를 쓰면 AI가 공감해 주고 감정 변화를 시각화해 주는 감정 기반 AI 다이어리 플랫폼입니다.
 
-> 감정 일기를 쓰면 AI가 공감해주고, 감정 변화를 시각화해주는 **감정 기반 AI 다이어리 플랫폼**
+## 시연 영상
+https://github.com/user-attachments/assets/3e44ed73-e043-4034-978c-3daf407cd771
 
-**서비스**: https://moodiary-five.vercel.app  
-> 백엔드는 Render 무료 플랜이라 처음 접속 시 서버가 깨어나는 데 최대 1분 정도 걸립니다.  
+**서비스**: https://moodiary-five.vercel.app
+> 백엔드는 Render 무료 플랜이라 처음 접속 시 서버가 깨어나는 데 최대 1분 정도 걸립니다.
+
 **개발자**: 박준영 (1인 풀스택)
-
 ---
 
 ## 주요 기능
