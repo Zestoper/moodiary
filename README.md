@@ -113,8 +113,8 @@ AI 기능은 월별 무료 쿼터가 있으며, 초과 시 크레딧(1회 = 1 �
 | PUT | `/api/diary/{id}` | 일기 수정 (내용 변경 시 감정 재분석 + 솔루션 초기화) |
 | DELETE | `/api/diary/{id}` | 일기 삭제 |
 | POST | `/api/diary/{id}/solution` | AI 맞춤 솔루션 생성 (감정 점수 1~2 전용, 쿼터 소비) |
-| POST | `/api/chat/stream` | AI 채팅 SSE 스트리밍 (Qwen3-32B, 페르소나 지정) |
-| POST | `/api/chat/send` | AI 채팅 메시지 전송 (비스트리밍, LLaMA 3.3 70B) |
+| POST | `/api/chat/stream` | AI 채팅 SSE 스트리밍 (Qwen3, 페르소나 지정) |
+| POST | `/api/chat/send` | AI 채팅 메시지 전송 (비스트리밍, gpt-oss-120b) |
 | GET | `/api/chat/history` | 채팅 내역 조회 (`?diary_id=N`) |
 | DELETE | `/api/chat/history` | 채팅 내역 삭제 (대화 초기화) |
 | POST | `/api/consult` | 연애 상담 요청 (쿼터 소비) |
@@ -184,7 +184,7 @@ npm start
 
 | 결정 | 선택 | 이유 |
 |---|---|---|
-| AI 모델 | Groq API (LLaMA 3.3 70B / Qwen3-32B) | 무료 고성능 + 빠른 응답속도. 한국어 품질 검증 후 Qwen3를 채팅 전용으로 분리 |
+| AI 모델 | Groq API (gpt-oss-120b · Qwen3) + Cerebras 폴백 | 무료 고성능 + 빠른 응답속도. 분석 · 리포트는 gpt-oss-120b · 채팅은 한국어 맞춤법이 더 정확한 Qwen3로 분리. 모델 종료 · 한도 초과 시 다음 모델로 자동 전환 |
 | 채팅 스트리밍 | SSE (Server-Sent Events) | WebSocket 대비 단방향 스트리밍에 적합, 연결 관리 단순 |
 | DB | PostgreSQL (Supabase) | 개발 환경 MySQL, 배포는 Supabase 무료 플랜으로 빠른 배포 |
 | 채팅 구조 | diary_id 기반 채팅방 분리 | 일기별 독립 컨텍스트 유지. diary_id=NULL은 일반 채팅 |
@@ -195,11 +195,11 @@ npm start
 ## 트러블슈팅
 
 **Groq AI 응답에 한자·일본어 섞임**  
-LLaMA 모델이 한국어 응답 중간에 간헐적으로 한자나 일본어를 출력하는 현상.  
+초기에 쓰던 LLaMA 모델이 한국어 응답 중간에 간헐적으로 한자나 일본어를 출력하는 현상.  
 → `_filter_cjk()` 함수로 유니코드 범위 기반 정규식 필터 구현. 스트리밍 청크 단위 적용 시 단어 경계 공백 유지에 주의.
 
 **Qwen3 스트리밍 중 `<think>` 태그 노출**  
-Qwen3-32B 모델이 Chain-of-Thought 추론을 `<think>...</think>` 블록으로 응답에 포함.  
+Qwen3 모델이 Chain-of-Thought 추론을 `<think>...</think>` 블록으로 응답에 포함.  
 → `_filter_think_tags()` 함수로 정규식 DOTALL 매칭 후 제거. 스트리밍 버퍼에서 `</think>` 감지 후 실제 응답만 yield.
 
 **Groq AI 응답에 러시아어(키릴 문자) 섞임**  
@@ -213,6 +213,10 @@ Qwen3 모델이 한국어 응답 중간에 키릴 문자를 간헐적으로 출�
 **startup 마이그레이션 충돌**  
 Alembic 미적용 상태로 배포 시 `is_admin`, `credits` 컬럼 누락으로 런타임 오류 발생.  
 → `main.py` startup 이벤트에서 `ALTER TABLE ... ADD COLUMN IF NOT EXISTS`로 간이 마이그레이션 추가.
+
+**새벽에 쓴 일기가 전날 날짜로 저장**  
+DB는 시각을 UTC로 시간대 표시 없이 저장하는데 브라우저가 이를 한국 시간으로 읽어 새벽 0~9시에 쓴 일기가 전날 칸에 표시되고 월간 리포트 범위도 9시간 어긋남.  
+→ `core/timeutil.py`에 KST 변환 함수를 모으고 API 응답 시각에 `+00:00`을 붙여 내보내도록 직렬화. 날짜 계산(월간 리포트 · 기억 추출)은 KST 기준으로 통일.
 
 ---
 
