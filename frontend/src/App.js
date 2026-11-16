@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ServerWakeGate from './components/ServerWakeGate';
 import LoginPage from './pages/LoginPage';
+import OAuthCallbackPage from './pages/OAuthCallbackPage';
 import DiaryPage from './pages/DiaryPage';
 import RecapPage from './pages/RecapPage';
 import ChatPage from './pages/ChatPage';
@@ -23,6 +24,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/login"    element={<LoginPage />} />
+              <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
               <Route path="/diary"    element={<DiaryPage />} />
               <Route path="/chat"     element={<ChatPage />} />
               <Route path="/calendar" element={<CalendarPage />} />

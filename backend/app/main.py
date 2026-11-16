@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import auth, diary, chat, consult, music, report, payment, admin
+from .routers import auth, oauth, diary, chat, consult, music, report, payment, admin
 from .core.database import engine
 from sqlalchemy import text
 
@@ -47,6 +47,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router,   prefix="/api/auth",   tags=["auth"])
+app.include_router(oauth.router,  prefix="/api/auth",   tags=["oauth"])
 app.include_router(diary.router,  prefix="/api/diary",  tags=["diary"])
 app.include_router(chat.router,   prefix="/api/chat",   tags=["chat"])
 app.include_router(consult.router, prefix="/api/consult", tags=["consult"])

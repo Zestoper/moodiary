@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     PORTONE_IMP_KEY: Optional[str] = None
     PORTONE_IMP_SECRET: Optional[str] = None
 
+    # 소셜 로그인 (구글 · 카카오) — app/routers/oauth.py
+    BACKEND_URL: str = ""            # 이 서버 주소. 비우면 Render 주소 → http://localhost:8000 순으로 잡는다
+    FRONTEND_URL: str = "http://localhost:3000"
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    KAKAO_REST_API_KEY: str = ""
+    KAKAO_CLIENT_SECRET: str = ""    # 카카오 콘솔에서 Client Secret 을 '사용'으로 켰을 때만
+
     class Config:
         env_file = ".env"
 
