@@ -26,6 +26,7 @@ https://github.com/user-attachments/assets/3e44ed73-e043-4034-978c-3daf407cd771
 | **YouTube 음악 추천** | 감정 태그·점수·장르 선호도 기반으로 YouTube Data API v3에서 플레이리스트 검색 추천 |
 | **크레딧 결제** | PortOne(아임포트) 연동. 5/10/30 크레딧 패키지(1,500/2,900/7,900원) |
 | **관리자 페이지** | 유저·일기·AI 사용량·결제 통계 대시보드. 크레딧 수동 지급 |
+| **소셜 로그인** | 카카오 · 구글 계정으로 바로 가입·로그인. 처음 가입하면 취향 설정(온보딩)으로 이동하고 인증된 같은 이메일의 기존 계정은 자동 연결 |
 
 ---
 
@@ -37,7 +38,7 @@ https://github.com/user-attachments/assets/3e44ed73-e043-4034-978c-3daf407cd771
 | **Backend** | FastAPI · Uvicorn · SQLAlchemy · Alembic |
 | **AI** | Groq API — gpt-oss-120b (감정 분석·솔루션·상담·리포트·기억 추출) / Qwen3 (채팅 스트리밍) · 한도 초과 시 다른 모델로 자동 전환 |
 | **Database** | PostgreSQL · Supabase (개발: MySQL) |
-| **인증** | JWT (python-jose) · Passlib · bcrypt |
+| **인증** | JWT (python-jose) · Passlib · bcrypt · 카카오/구글 OAuth2 (httpx) |
 | **외부 API** | YouTube Data API v3 · PortOne(아임포트) |
 | **배포** | Render (Backend) · Vercel (Frontend) |
 
@@ -109,6 +110,8 @@ AI 기능은 월별 무료 쿼터가 있으며, 초과 시 크레딧(1회 = 1 �
 | POST | `/api/auth/register` | 회원가입 |
 | POST | `/api/auth/login` | 로그인 (JWT 발급) |
 | GET | `/api/auth/me` | 내 정보 조회 |
+| GET | `/api/auth/{provider}/login` | 소셜 로그인 시작 (`kakao` · `google`) |
+| GET | `/api/auth/{provider}/callback` | 소셜 로그인 콜백 → JWT 발급 후 프론트로 이동 |
 | PATCH | `/api/auth/me` | 프로필·취향 설정 업데이트 |
 | GET | `/api/diary` | 일기 목록 (최신순) |
 | POST | `/api/diary` | 일기 작성 + AI 감정 분석 자동 실행 |
@@ -165,6 +168,16 @@ GROQ_API_KEY=your_groq_api_key
 YOUTUBE_API_KEY=your_youtube_api_key
 PORTONE_IMP_KEY=your_portone_imp_key
 PORTONE_IMP_SECRET=your_portone_imp_secret
+
+# 소셜 로그인 (선택 — 비워두면 해당 버튼만 비활성화)
+#   콜백 주소는 {BACKEND_URL}/api/auth/{kakao|google}/callback 로 서버가 만든다
+#   → 카카오 · 구글 콘솔의 Redirect URI 에 이 주소를 등록
+BACKEND_URL=http://localhost:8000
+FRONTEND_URL=http://localhost:3000
+KAKAO_REST_API_KEY=your_kakao_rest_api_key
+KAKAO_CLIENT_SECRET=                 # 카카오 콘솔에서 Client Secret 을 켰을 때만
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
 ### 3. 서버 실행
